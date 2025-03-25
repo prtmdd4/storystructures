@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Story Structure for Kids</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, Arial, sans-serif;
+      background: #faf9f3;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #ffcc66;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2em;
+      color: #5c3d00;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #fffdf5;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    .navigation-buttons {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .btn {
+      background-color: #ff9933;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      padding: 12px 20px;
+      margin: 5px;
+      box-shadow: 1px 2px 5px rgba(0,0,0,0.2);
+    }
+    .btn:hover {
+      background-color: #e68a2e;
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #5c3d00;
+    }
+
+    p {
+      line-height: 1.4em;
+    }
+
+    .story-container {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .visible {
+      display: block !important;
+    }
+
+    /* Example story box (on intro page) */
+    .example-story {
+      background-color: #fef7e6;
+      border-left: 5px solid #ffbb33;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .example-story h3 {
+      margin-top: 0;
+    }
+
+    /* Drag-and-drop sections */
+    .parts-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .draggable {
+      background-color: #ffeebb;
+      border: 2px dashed #ff9933;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: move;
+      min-width: 150px;
+      text-align: center;
+      user-select: none; /* Prevent text selection while dragging */
+      transition: background-color 0.3s;
+    }
+    .draggable:hover {
+      background-color: #fff5d0;
+    }
+
+    .dropzone {
+      background-color: #fef2d8;
+      border: 2px dotted #ffa64d;
+      border-radius: 5px;
+      width: 170px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 5px;
+      transition: background-color 0.3s;
+    }
+    .dropzone:hover {
+      background-color: #fff0cc;
+    }
+
+    .dropzone.correct {
+      border: 2px solid green;
+      background-color: #d4ffd4;
+    }
+
+    .hint {
+      color: red;
+      text-align: center;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .congratulations {
+      display: none;
+      text-align: center;
+      font-size: 1.2em;
+      color: green;
+      margin-bottom: 20px;
+    }
+
+    /* Quiz styling */
+    .quiz-container {
+      display: none;
+      margin: 20px 0;
+    }
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+    .score-message {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin: 15px 0;
+      display: none;
+    }
+
+    /* Confetti canvas overlay */
+    #confetti-canvas {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: none;
+    }
+
+    /* Help popup (modal) */
+    #help-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff9ef;
+      border: 2px solid #ffc966;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      width: 300px;
+      max-width: 90%;
+      padding: 20px;
+      z-index: 10000;
+      display: none;
+    }
+    #help-modal h4 {
+      margin-top: 0;
+      color: #5c3d00;
+    }
+    #help-modal p {
+      margin: 8px 0;
+    }
+    #help-modal .close-btn {
+      background: #ffa64d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      float: right;
+      margin-top: 10px;
+    }
+    #help-modal .close-btn:hover {
+      background: #e6953d;
+    }
+    .explanation-link {
+      font-size: 0.9em;
+      cursor: pointer;
+      color: #cc6600;
+      text-decoration: underline;
+      margin-left: 3px;
+    }
+    .explanation-link:hover {
+      color: #ff9933;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Story Structure for Kids</h1>
+</header>
+<main>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- HELP POPUP (Modal) -->
+  <div id="help-modal">
+    <h4 id="help-modal-title"></h4>
+    <p id="help-modal-content"></p>
+    <button class="close-btn" onclick="closeHelpModal()">Close</button>
+  </div>
+
+  <!-- INTRODUCTION PAGE (EXPLANATION & EXAMPLE) -->
+  <div id="intro-page" class="story-container visible">
+    <h2>Welcome!</h2>
+    <p>
+      In this activity, you will learn about the <strong>5 parts of a story</strong>:
+      <em>Introduction, Rising Action, Climax, Falling Action, and Resolution.</em>
+    </p>
+    <p>
+      Each story has these parts mixed up. You'll drag and drop each part into the correct place.
+      After you get it right, you'll take a quick quiz!
+    </p>
+    <p>
+      Click on any label (<em>Introduction, Rising Action, etc.</em>) to see a description and an example!
+    </p>
+    <div class="example-story">
+      <h3>Example Story: "The Friendly Giant"</h3>
+      <p><strong>Introduction:</strong> There was a giant who lived on a tall hill, feeling lonely.</p>
+      <p><strong>Rising Action:</strong> He heard there was a village nearby, so he decided to visit, but the villagers ran away at first.</p>
+      <p><strong>Climax:</strong> One brave child said "Hello," and realized the giant was actually kind and just needed a friend.</p>
+      <p><strong>Falling Action:</strong> The villagers gathered and listened to the giant's story.</p>
+      <p><strong>Resolution:</strong> The giant became friends with everyone, and they visited him on his hill often.</p>
+    </div>
+    <p style="text-align:center;">Ready to try your first story?</p>
+    <div class="navigation-buttons">
+      <button class="btn" onclick="showStory('story-1')">Go to Story 1 &raquo;</button>
+    </div>
+  </div>
+
+  <!-- STORY 1 -->
+  <div class="story-container" id="story-1">
+    <h2>Story 1: "The Lost Kitten"</h2>
+    <p style="text-align:center;"><strong>Read each part below, then drag them into the correct labeled dropzone!</strong></p>
+
+    <!-- Jumbled Parts -->
+    <div class="parts-container" id="story-1-draggables">
+      <div class="draggable" draggable="true" data-part="introduction" data-text="One sunny morning, Mia found a kitten outside her door.">One sunny morning, Mia found a kitten outside her door.</div>
+      <div class="draggable" draggable="true" data-part="falling" data-text="Mia took the kitten home and gave it a cozy bed.">Mia took the kitten home and gave it a cozy bed.</div>
+      <div class="draggable" draggable="true" data-part="rising" data-text="She asked all her neighbors if they had lost a kitten.">She asked all her neighbors if they had lost a kitten.</div>
+      <div class="draggable" draggable="true" data-part="resolution" data-text="In the end, she decided to adopt the kitten and named it Snowball.">In the end, she decided to adopt the kitten and named it Snowball.</div>
+      <div class="draggable" draggable="true" data-part="climax" data-text="Finally, she found a poster of a missing kitten, but it wasn’t the same one!">Finally, she found a poster of a missing kitten, but it wasn’t the same one!</div>
+    </div>
+
+    <!-- Dropzones (with explanation links) -->
+    <div class="parts-container">
+      <div>
+        <div><strong>Introduction</strong>
+          <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="introduction"></div>
+      </div>
+      <div>
+        <div><strong>Rising Action</strong>
+          <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="rising"></div>
+      </div>
+      <div>
+        <div><strong>Climax</strong>
+          <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="climax"></div>
+      </div>
+      <div>
+        <div><strong>Falling Action</strong>
+          <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="falling"></div>
+      </div>
+      <div>
+        <div><strong>Resolution</strong>
+          <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="resolution"></div>
+      </div>
+    </div>
+
+    <div class="hint" id="story-1-hint">Oops! One or more parts are incorrect. Check the structure labels again!</div>
+    <div style="text-align: center;">
+      <button class="btn" onclick="checkAnswers('story-1')">Submit</button>
+    </div>
+
+    <!-- Congratulations + Confetti Trigger -->
+    <div class="congratulations" id="story-1-congrats">Congratulations! You placed all parts correctly!</div>
+
+    <!-- QUIZ SECTION -->
+    <div class="quiz-container" id="story-1-quiz">
+      <h3>Quiz: Answer these questions about "The Lost Kitten"</h3>
+      <div class="quiz-question">
+        <p>1. Where did Mia find the kitten?</p>
+        <label><input type="radio" name="story-1-q1" value="correct"> Outside her door</label><br>
+        <label><input type="radio" name="story-1-q1" value="wrong"> At the park</label><br>
+        <label><input type="radio" name="story-1-q1" value="wrong"> In a tree</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>2. What was the kitten’s name?</p>
+        <label><input type="radio" name="story-1-q2" value="wrong"> Sparky</label><br>
+        <label><input type="radio" name="story-1-q2" value="correct"> Snowball</label><br>
+        <label><input type="radio" name="story-1-q2" value="wrong"> Pepper</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>3. Mia looked for the kitten’s owner by:</p>
+        <label><input type="radio" name="story-1-q3" value="wrong"> Posting online</label><br>
+        <label><input type="radio" name="story-1-q3" value="correct"> Asking neighbors</label><br>
+        <label><input type="radio" name="story-1-q3" value="wrong"> Calling the police</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>4. What happened when Mia found a missing poster?</p>
+        <label><input type="radio" name="story-1-q4" value="correct"> It was a different kitten</label><br>
+        <label><input type="radio" name="story-1-q4" value="wrong"> It was the right kitten</label><br>
+        <label><input type="radio" name="story-1-q4" value="wrong"> She lost the poster</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>5. How did the story end?</p>
+        <label><input type="radio" name="story-1-q5" value="correct"> Mia adopted the kitten</label><br>
+        <label><input type="radio" name="story-1-q5" value="wrong"> The kitten ran away</label><br>
+        <label><input type="radio" name="story-1-q5" value="wrong"> A neighbor claimed the kitten</label><br>
+      </div>
+      <div style="text-align: center;">
+        <button class="btn" onclick="submitQuiz('story-1')">Submit Quiz</button>
+      </div>
+      <div class="score-message" id="story-1-score"></div>
+    </div>
+
+    <!-- Next Story Button -->
+    <div style="text-align: center;">
+      <button class="btn" id="story-1-next" style="display:none;" onclick="showStory('story-2')">Next Story</button>
+    </div>
+  </div>
+
+  <!-- STORY 2 -->
+  <div class="story-container" id="story-2">
+    <h2>Story 2: "Max and the Magic Seed"</h2>
+    <p style="text-align:center;"><strong>Read each part below, then drag them into the correct labeled dropzone!</strong></p>
+
+    <div class="parts-container" id="story-2-draggables">
+      <div class="draggable" draggable="true" data-part="falling" data-text="Max watered it carefully and watched it grow quickly.">Max watered it carefully and watched it grow quickly.</div>
+      <div class="draggable" draggable="true" data-part="climax" data-text="Suddenly, a giant beanstalk sprang up to the sky!">Suddenly, a giant beanstalk sprang up to the sky!</div>
+      <div class="draggable" draggable="true" data-part="rising" data-text="He decided to plant it in his backyard.">He decided to plant it in his backyard.</div>
+      <div class="draggable" draggable="true" data-part="resolution" data-text="In the end, he climbed down with a big smile and a new friend, a friendly sparrow.">In the end, he climbed down with a big smile and a new friend, a friendly sparrow.</div>
+      <div class="draggable" draggable="true" data-part="introduction" data-text="One day, Max found a shiny seed that sparkled in the sun.">One day, Max found a shiny seed that sparkled in the sun.</div>
+    </div>
+
+    <div class="parts-container">
+      <div>
+        <div><strong>Introduction</strong>
+          <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="introduction"></div>
+      </div>
+      <div>
+        <div><strong>Rising Action</strong>
+          <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="rising"></div>
+      </div>
+      <div>
+        <div><strong>Climax</strong>
+          <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="climax"></div>
+      </div>
+      <div>
+        <div><strong>Falling Action</strong>
+          <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="falling"></div>
+      </div>
+      <div>
+        <div><strong>Resolution</strong>
+          <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
+        </div>
+        <div class="dropzone" data-accept="resolution"></div>
+      </div>
+    </div>
+
+    <div class="hint" id="story-2-hint" style="display:none;">Oops! One or more parts are incorrect.</div>
+    <div style="text-align:center;">
+      <button class="btn" onclick="checkAnswers('story-2')">Submit</button>
+    </div>
+
+    <div class="congratulations" id="story-2-congrats">Congratulations! You placed all parts correctly!</div>
+
+    <div class="quiz-container" id="story-2-quiz">
+      <h3>Quiz: "Max and the Magic Seed"</h3>
+      <div class="quiz-question">
+        <p>1. What did Max find?</p>
+        <label><input type="radio" name="story-2-q1" value="correct"> A shiny seed</label><br>
+        <label><input type="radio" name="story-2-q1" value="wrong"> A golden egg</label><br>
+        <label><input type="radio" name="story-2-q1" value="wrong"> A magic shoe</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>2. Where did he plant it?</p>
+        <label><input type="radio" name="story-2-q2" value="wrong"> In a pot</label><br>
+        <label><input type="radio" name="story-2-q2" value="correct"> In his backyard</label><br>
+        <label><input type="radio" name="story-2-q2" value="wrong"> In the forest</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>3. The giant beanstalk appeared:</p>
+        <label><input type="radio" name="story-2-q3" value="wrong"> Slowly and quietly</label><br>
+        <label><input type="radio" name="story-2-q3" value="correct"> Suddenly shooting into the sky</label><br>
+        <label><input type="radio" name="story-2-q3" value="wrong"> After a week of waiting</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>4. What was the exciting moment?</p>
+        <label><input type="radio" name="story-2-q4" value="correct"> The beanstalk grew huge</label><br>
+        <label><input type="radio" name="story-2-q4" value="wrong"> Max went to sleep</label><br>
+        <label><input type="radio" name="story-2-q4" value="wrong"> The seed disappeared</label><br>
+      </div>
+      <div class="quiz-question">
+        <p>5. Who became Max’s friend at the end?</p>
+        <label><input type="radio" name="story-2-q5" value="wrong"> A mouse</label><br>
+        <label><input type="radio" name="story-2-q5" value="correct"> A friendly sparrow</label><br>
+        <label><input type="radio" name="story-2-q5" value="wrong"> A caterpillar</label><br>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn" onclick="submitQuiz('story-2')">Submit Quiz</button>
+      </div>
+      <div class="score-message" id="story-2-score"></div>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="btn" id="story-2-next" style="display:none;" onclick="showStory('story-3')">Next Story</button>
+    </div>
+  </div>
+
+  <!-- STORY 3 (repeat the same pattern)... -->
+  <div class="story-container" id="story-3">
+    <h2>Story 3: "Lucy and the Broken Robot"</h2>
+    <!-- Omitted for brevity; add your jumbled parts, quiz, etc. -->
+    <p><em>Fill in similarly as above...</em></p>
+
+    <div style="text-align:center;">
+      <button class="btn" onclick="showStory('story-4')">Next Story</button>
+    </div>
+  </div>
+
+  <!-- ...STORIES 4 - 10 WOULD GO HERE, following the same structure... -->
+
+  <!-- FINAL MESSAGE AFTER STORY 10 -->
+  <div id="final-message" class="story-container">
+    <h2 style="text-align:center;">Great job!</h2>
+    <p style="text-align:center;">
+      You have completed all 10 stories. Keep practicing to become a master at story structure!
+    </p>
+  </div>
+
+</main>
+
+<script>
+/*****************************************************
+  PART EXPLANATIONS (for help modal)
+*****************************************************/
+const partExplanations = {
+  introduction: {
+    title: "Introduction",
+    content: "The Introduction sets the scene for your story by telling us the characters, setting, and main situation. Example: 'One morning, Anna woke up to find a talking bird at her window.'"
+  },
+  rising: {
+    title: "Rising Action",
+    content: "The Rising Action introduces or builds up the conflict or problem. Tension grows and events lead up to the story's climax. Example: 'Anna follows the bird into a dark forest, even though she feels nervous.'"
+  },
+  climax: {
+    title: "Climax",
+    content: "The Climax is the turning point or the most exciting part of the story. Example: 'The bird suddenly transforms into a magical creature and reveals a hidden treasure!'"
+  },
+  falling: {
+    title: "Falling Action",
+    content: "The Falling Action shows what happens after the climax and starts to resolve the story's conflict. Example: 'Anna helps the magical creature return home safely, and the forest becomes bright again.'"
+  },
+  resolution: {
+    title: "Resolution",
+    content: "The Resolution is how the story ends and ties up loose ends. Example: 'Anna returns to her house, treasure in hand, and lives happily ever after with her new friend.'"
+  }
+};
+
+/*****************************************************
+  HELP MODAL FUNCTIONS
+*****************************************************/
+function showHelpModal(part) {
+  const modal = document.getElementById('help-modal');
+  const modalTitle = document.getElementById('help-modal-title');
+  const modalContent = document.getElementById('help-modal-content');
+
+  if (partExplanations[part]) {
+    modalTitle.textContent = partExplanations[part].title;
+    modalContent.textContent = partExplanations[part].content;
+  } else {
+    modalTitle.textContent = "Unknown Part";
+    modalContent.textContent = "No description available.";
+  }
+
+  modal.style.display = 'block';
+}
+
+function closeHelpModal() {
+  const modal = document.getElementById('help-modal');
+  modal.style.display = 'none';
+}
+
+/*****************************************************
+  Confetti
+*****************************************************/
+let confettiCanvas = document.getElementById('confetti-canvas');
+let confettiCtx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiActive = false;
+
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function initConfetti() {
+  let confettiCount = 120;
+  for (let i = 0; i < confettiCount; i++) {
+    confettiParticles.push({
+      x: randomRange(0, window.innerWidth),
+      y: randomRange(0, window.innerHeight),
+      r: randomRange(2, 6),
+      d: randomRange(1, 2),
+      color: `hsl(${randomRange(0,360)},100%,50%)`,
+      tilt: randomRange(-10, 10)
+    });
+  }
+  confettiCanvas.style.display = 'block';
+  confettiActive = true;
+  animateConfetti();
+}
+
+function animateConfetti() {
+  if (!confettiActive) return;
+  confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  confettiParticles.forEach((p, i) => {
+    confettiCtx.beginPath();
+    confettiCtx.arc(p.x, p.y, p.r, 0, Math.PI*2, false);
+    confettiCtx.fillStyle = p.color;
+    confettiCtx.fill();
+    p.x += Math.sin(0.01) * p.d;
+    p.y += (Math.cos(0.01)+ p.r/2) * p.d;
+    p.tilt += 0.1;
+    if (p.y > window.innerHeight) {
+      p.x = randomRange(0, window.innerWidth);
+      p.y = -10;
+    }
+  });
+  requestAnimationFrame(animateConfetti);
+}
+
+function stopConfetti() {
+  confettiActive = false;
+  confettiCanvas.style.display = 'none';
+  confettiParticles = [];
+}
+
+/*****************************************************
+  DRAG AND DROP
+*****************************************************/
+let draggedItem = null;
+let originalText = null;
+
+document.addEventListener('dragstart', function (e) {
+  if (e.target.classList.contains('draggable')) {
+    draggedItem = e.target;
+    // Revert to original text (without the "Introduction: ..." prefix, etc.)
+    if (draggedItem.getAttribute('data-text')) {
+      draggedItem.textContent = draggedItem.getAttribute('data-text');
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  }
+});
+
+document.addEventListener('dragover', function (e) {
+  e.preventDefault(); // allow dropping
+});
+
+document.addEventListener('drop', function (e) {
+  e.preventDefault();
+  if (e.target.classList.contains('dropzone') && draggedItem) {
+    // If we drop on a valid dropzone, place the dragged item there
+    e.target.innerHTML = '';
+    e.target.appendChild(draggedItem);
+
+    // Show label on the item to help the child see where it was placed
+    let zoneName = e.target.getAttribute('data-accept');
+    let partTitle = zoneName.charAt(0).toUpperCase() + zoneName.slice(1); // e.g. "Introduction"
+    draggedItem.innerHTML = `<strong>${partTitle}:</strong> ${draggedItem.getAttribute('data-text')}`;
+
+    draggedItem = null;
+  }
+});
+
+/*****************************************************
+  CHECKING ANSWERS
+*****************************************************/
+function checkAnswers(storyId) {
+  const container = document.getElementById(storyId);
+  const dropzones = container.querySelectorAll('.dropzone');
+  let allCorrect = true;
+
+  dropzones.forEach(dz => {
+    const expected = dz.getAttribute('data-accept');
+    if (dz.children.length === 1) {
+      const child = dz.children[0];
+      const part = child.getAttribute('data-part');
+      if (part !== expected) {
+        allCorrect = false;
+      }
+    } else {
+      allCorrect = false;
+    }
+  });
+
+  if (!allCorrect) {
+    // Show hint
+    const hint = document.getElementById(storyId + '-hint');
+    if (hint) hint.style.display = 'block';
+  } else {
+    // Hide hint
+    const hint = document.getElementById(storyId + '-hint');
+    if (hint) hint.style.display = 'none';
+    // Show congratulations
+    const congrats = document.getElementById(storyId + '-congrats');
+    if (congrats) congrats.style.display = 'block';
+    // Start confetti
+    initConfetti();
+    // Stop confetti after some time
+    setTimeout(stopConfetti, 3000);
+
+    // Show quiz
+    const quiz = document.getElementById(storyId + '-quiz');
+    if (quiz) {
+      quiz.style.display = 'block';
+    }
+  }
+}
+
+/*****************************************************
+  QUIZ SUBMISSION
+*****************************************************/
+function submitQuiz(storyId) {
+  const container = document.getElementById(storyId);
+  const quizContainer = container.querySelector('.quiz-container');
+  if (!quizContainer) return;
+
+  let score = 0;
+  let questionNumber = 1;
+  const inputs = quizContainer.querySelectorAll('input[type="radio"]');
+
+  // We'll group them by name. For each group, check if correct is selected
+  // Another approach: name them story-1-q1, story-1-q2, etc.
+  // Let's just do a simpler method here:
+  let answerGroups = {};
+  inputs.forEach((input) => {
+    const name = input.getAttribute('name');
+    if (!answerGroups[name]) {
+      answerGroups[name] = [];
+    }
+    answerGroups[name].push(input);
+  });
+
+  // For each group (question), see which is checked
+  Object.keys(answerGroups).forEach((groupName) => {
+    const radios = answerGroups[groupName];
+    radios.forEach(radio => {
+      if (radio.checked && radio.value === 'correct') {
+        score++;
+      }
+    });
+  });
+
+  // Show score
+  const scoreMessage = container.querySelector('.score-message');
+  if (scoreMessage) {
+    scoreMessage.textContent = `You scored ${score} out of 5!`;
+    scoreMessage.style.display = 'block';
+  }
+
+  // Show next story button
+  const nextBtn = document.getElementById(storyId + '-next');
+  if (nextBtn) {
+    nextBtn.style.display = 'inline-block';
+  }
+}
+
+/*****************************************************
+  NAVIGATION
+*****************************************************/
+function showStory(storyId) {
+  // Hide all story containers
+  const allStories = document.querySelectorAll('.story-container');
+  allStories.forEach(story => {
+    story.classList.remove('visible');
+  });
+
+  // Show the requested story
+  const target = document.getElementById(storyId);
+  if (target) {
+    target.classList.add('visible');
+    window.scrollTo(0,0);
+  }
+}
+
+window.addEventListener('resize', function() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+});
+
+window.onload = function() {
+  // Fit confetti canvas to window
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+
+  // Show the intro page by default
+  showStory('intro-page');
+};
+</script>
+</body>
+</html>
