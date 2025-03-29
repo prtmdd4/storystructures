@@ -238,6 +238,16 @@
       text-align: left;
       z-index: 99999;
     }
+    .speaker-icon {
+      cursor: pointer;
+      margin-left: 5px;
+      font-size: 1.1em;
+      display: inline-block; /* Prevents layout shifts */
+      vertical-align: middle; /* Aligns icon nicely with text */
+    }
+    .speaker-icon:hover {
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
@@ -590,6 +600,55 @@ window.onload = function() {
   document.getElementById('all-stories-container').innerHTML = window.ALL_STORIES_HTML;
   showStory('intro-page');
 };
+
+let currentAudio = null; // Keep track of the currently playing audio
+
+function playAudio(partKey) {
+  const soundMap = {
+    'introduction': 'introduction.mp3',
+    'rising': 'risingaction.mp3',
+    'climax': 'climax.mp3',
+    'falling': 'fallingaction.mp3',
+    'resolution': 'resolution.mp3'
+  };
+  const fileName = soundMap[partKey];
+  const soundPath = `sounds/${fileName}`;
+
+  if (!fileName) {
+    console.error("Sound file not found for part:", partKey);
+    return;
+  }
+
+  // If clicking the same icon while it's playing, stop it
+  if (currentAudio && currentAudio.src.endsWith(soundPath)) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+    return;
+  }
+
+  // If another sound is playing, stop it first
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+
+  // Create and play the new sound
+  const newAudio = new Audio(soundPath);
+  currentAudio = newAudio; // Store the new audio instance
+
+  // When the sound finishes naturally, clear the reference
+  newAudio.addEventListener('ended', () => {
+    if (currentAudio === newAudio) { // Ensure it's the same audio instance
+      currentAudio = null;
+    }
+  });
+
+  newAudio.play().catch(e => {
+    console.error("Error playing audio:", e);
+    currentAudio = null; // Clear reference on error too
+  });
+}
 </script>
 </body>
 </html>

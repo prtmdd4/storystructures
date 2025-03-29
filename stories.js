@@ -26,31 +26,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -127,31 +127,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -228,31 +228,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -329,31 +329,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -430,31 +430,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -531,31 +531,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -632,31 +632,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -733,31 +733,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -834,31 +834,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
@@ -935,31 +935,31 @@ window.ALL_STORIES_HTML = `
   </div>
   <div class="parts-container">
     <div>
-      <div><strong>Introduction</strong>
+      <div><strong>Introduction</strong><span class="speaker-icon" onclick="playAudio('introduction')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('introduction')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="introduction"></div>
     </div>
     <div>
-      <div><strong>Rising Action</strong>
+      <div><strong>Rising Action</strong><span class="speaker-icon" onclick="playAudio('rising')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('rising')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="rising"></div>
     </div>
     <div>
-      <div><strong>Climax</strong>
+      <div><strong>Climax</strong><span class="speaker-icon" onclick="playAudio('climax')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('climax')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="climax"></div>
     </div>
     <div>
-      <div><strong>Falling Action</strong>
+      <div><strong>Falling Action</strong><span class="speaker-icon" onclick="playAudio('falling')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('falling')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="falling"></div>
     </div>
     <div>
-      <div><strong>Resolution</strong>
+      <div><strong>Resolution</strong><span class="speaker-icon" onclick="playAudio('resolution')">🔊</span>
         <span class="explanation-link" onclick="showHelpModal('resolution')">[What is this?]</span>
       </div>
       <div class="dropzone" data-accept="resolution"></div>
