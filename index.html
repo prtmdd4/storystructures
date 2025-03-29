@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Story Structure for Kids</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, Arial, sans-serif;
+      background: #faf9f3;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #ffcc66;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
+    }
+    h1 {
+      margin: 0;
+      font-size: 2em;
+      color: #5c3d00;
+    }
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #fffdf5;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .navigation-buttons {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .btn {
+      background-color: #ff9933;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      padding: 12px 20px;
+      margin: 5px;
+      box-shadow: 1px 2px 5px rgba(0,0,0,0.2);
+    }
+    .btn:hover {
+      background-color: #e68a2e;
+    }
+    h2, h3 {
+      text-align: center;
+      color: #5c3d00;
+      margin-top: 20px;
+    }
+    p {
+      line-height: 1.4em;
+    }
+    .story-container {
+      display: none;
+      margin-top: 10px;
+    }
+    .visible {
+      display: block !important;
+    }
+    .example-story {
+      background-color: #fef7e6;
+      border-left: 5px solid #ffbb33;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .example-story h3 {
+      margin-top: 0;
+    }
+    .parts-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .draggable {
+      background-color: #ffeebb;
+      border: 2px dashed #ff9933;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: move;
+      min-width: 150px;
+      text-align: center;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .draggable:hover {
+      background-color: #fff5d0;
+    }
+    .dropzone {
+      background-color: #fef2d8;
+      border: 2px dotted #ffa64d;
+      border-radius: 5px;
+      width: 170px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 5px;
+      transition: background-color 0.3s;
+      box-sizing: border-box;
+    }
+    .dropzone:hover {
+      background-color: #fff0cc;
+    }
+    .dropzone.correct {
+      border: 2px solid green;
+      background-color: #d4ffd4;
+    }
+    .hint {
+      color: red;
+      text-align: center;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .congratulations {
+      display: none;
+      text-align: center;
+      font-size: 1.2em;
+      color: green;
+      margin-bottom: 20px;
+    }
+    .quiz-container {
+      display: none;
+      margin: 20px 0;
+    }
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+    .score-message {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin: 15px 0;
+      display: none;
+    }
+    #confetti-canvas {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: none;
+    }
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff9ef;
+      border: 2px solid #ffc966;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      width: 300px;
+      max-width: 90%;
+      padding: 20px;
+      z-index: 10000;
+      display: none;
+    }
+    #help-modal h4, #error-modal h3 {
+      margin-top: 0;
+      color: #5c3d00;
+    }
+    #help-modal p, #error-modal p {
+      margin: 8px 0;
+    }
+    #help-modal .close-btn {
+      background: #ffa64d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      float: right;
+      margin-top: 10px;
+    }
+    #help-modal .close-btn:hover {
+      background: #e6953d;
+    }
+    .explanation-link {
+      font-size: 0.9em;
+      cursor: pointer;
+      color: #cc6600;
+      text-decoration: underline;
+      margin-left: 3px;
+    }
+    .explanation-link:hover {
+      color: #ff9933;
+    }
+    @keyframes flyBack {
+      0% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(-30px); opacity: 0.5; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .fly-back {
+      animation: flyBack 0.5s ease-out;
+    }
+    .highlight {
+      border: 2px solid red !important;
+    }
+    .tooltip-icon {
+      display: inline-block;
+      background: #ffa64d;
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      text-align: center;
+      line-height: 18px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 5px;
+      position: relative;
+    }
+    .tooltip-icon:hover .tooltip-text {
+      display: block;
+    }
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fef7e6;
+      color: #5c3d00;
+      border: 1px solid #ffa64d;
+      border-radius: 5px;
+      padding: 5px 8px;
+      white-space: normal;
+      max-width: 200px;
+      text-align: left;
+      z-index: 99999;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Story Structure for Kids</h1>
+</header>
+<main>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <div id="help-modal" class="modal">
+    <h4 id="help-modal-title"></h4>
+    <p id="help-modal-content"></p>
+    <button class="close-btn" onclick="closeHelpModal()">Close</button>
+  </div>
+
+  <div id="error-modal" class="modal">
+    <h3>Some parts are not in the right place:</h3>
+    <ul id="error-list"></ul>
+    <p>Please fix them by clicking <strong>Fix All</strong> below.</p>
+    <div style="text-align: right;">
+      <button class="btn" onclick="fixAllErrors()">Fix All</button>
+    </div>
+  </div>
+
+  <div id="intro-page" class="story-container visible">
+    <h2>Welcome!</h2>
+    <p>
+      In this activity, you will learn about the <strong>5 parts of a story</strong>:
+      <em>Introduction, Rising Action, Climax, Falling Action, and Resolution.</em>
+    </p>
+    <p>
+      Each story has these parts mixed up. You'll drag and drop each part into the correct place.
+      After you get it right, you'll take a quick quiz!
+    </p>
+    <p>
+      Click on any label (<em>Introduction, Rising Action, etc.</em>) to see a description and an example.
+    </p>
+    <div class="example-story">
+      <h3>Example Story: "The Friendly Giant"</h3>
+      <p><strong>Introduction:</strong> There was a giant who lived on a tall hill, feeling lonely.</p>
+      <p><strong>Rising Action:</strong> He heard there was a village nearby, so he decided to visit, but the villagers ran away at first.</p>
+      <p><strong>Climax:</strong> One brave child said "Hello," and realized the giant was kind and just needed a friend.</p>
+      <p><strong>Falling Action:</strong> The villagers gathered and listened to the giant's story.</p>
+      <p><strong>Resolution:</strong> The giant became friends with everyone, and they visited him on his hill often.</p>
+    </div>
+    <p style="text-align:center;">Choose a story to start:</p>
+    <div class="navigation-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+      <button class="btn" onclick="showStory('story-1')">Story 1: The Lost Kitten</button>
+      <button class="btn" onclick="showStory('story-2')">Story 2: Max and the Magic Seed</button>
+      <button class="btn" onclick="showStory('story-3')">Story 3: Lucy and the Broken Robot</button>
+      <button class="btn" onclick="showStory('story-4')">Story 4: Ben's Big Race</button>
+      <button class="btn" onclick="showStory('story-5')">Story 5: The Mysterious Note</button>
+      <button class="btn" onclick="showStory('story-6')">Story 6: Jenna's Sandcastle Challenge</button>
+      <button class="btn" onclick="showStory('story-7')">Story 7: Tom's Tall Treehouse</button>
+      <button class="btn" onclick="showStory('story-8')">Story 8: Ava and the Hidden Treasure</button>
+      <button class="btn" onclick="showStory('story-9')">Story 9: Oliver's Rocket Adventure</button>
+      <button class="btn" onclick="showStory('story-10')">Story 10: Ella's Enchanted Shoes</button>
+    </div>
+  </div>
+
+  <div id="all-stories-container"></div>
+
+  <div id="final-message" class="story-container">
+    <h2 style="text-align:center;">Great job!</h2>
+    <p style="text-align:center;">
+      You have completed all 10 stories. Keep practicing to become a master at story structure!
+    </p>
+    <div class="navigation-buttons">
+      <button class="btn" onclick="showStory('story-10')">Go Back &laquo;</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="stories.js"></script>
+<script>
+const partExplanations = {
+  introduction: {
+    title: "Introduction",
+    content: "The Introduction sets the scene by telling us about the characters, setting, and main situation of the story. Example: 'One morning, Anna woke up to find a talking bird at her window.'"
+  },
+  rising: {
+    title: "Rising Action",
+    content: "The Rising Action introduces or builds up the conflict/problem. Tension grows, leading to the climax. Example: 'Anna follows the bird into a dark forest, even though she feels nervous.'"
+  },
+  climax: {
+    title: "Climax",
+    content: "The Climax is the turning point or the most exciting part of the story. Example: 'The bird suddenly transforms into a magical creature and reveals a hidden treasure!'"
+  },
+  falling: {
+    title: "Falling Action",
+    content: "The Falling Action shows what happens after the climax and starts to resolve the story's conflict. Example: 'Anna helps the creature get home, and the forest becomes bright again.'"
+  },
+  resolution: {
+    title: "Resolution",
+    content: "The Resolution is how the story ends, tying up loose ends. Example: 'Anna returns home with the treasure and lives happily ever after with her new friend.'"
+  }
+};
+
+function showHelpModal(part) {
+  const modal = document.getElementById('help-modal');
+  const modalTitle = document.getElementById('help-modal-title');
+  const modalContent = document.getElementById('help-modal-content');
+  if (partExplanations[part]) {
+    modalTitle.textContent = partExplanations[part].title;
+    modalContent.textContent = partExplanations[part].content;
+  } else {
+    modalTitle.textContent = "Unknown Part";
+    modalContent.textContent = "No description available.";
+  }
+  modal.style.display = 'block';
+}
+function closeHelpModal() {
+  document.getElementById('help-modal').style.display = 'none';
+}
+
+function showErrorModal(storyId, errors) {
+  const errorModal = document.getElementById('error-modal');
+  const errorList = document.getElementById('error-list');
+  errorList.innerHTML = "";
+  errors.forEach((partName) => {
+    const label = partName.charAt(0).toUpperCase() + partName.slice(1);
+    let explanation = "";
+    const lowerPart = partName.toLowerCase();
+    if (partExplanations[lowerPart]) {
+      explanation = partExplanations[lowerPart].content;
+    }
+    const li = document.createElement('li');
+    const tooltip = `
+      <span class="tooltip-icon">?
+        <span class="tooltip-text">${explanation}</span>
+      </span>
+    `;
+    li.innerHTML = `${label} is incorrect. ${tooltip}`;
+    errorList.appendChild(li);
+  });
+  errorModal.style.display = 'block';
+}
+function hideErrorModal() {
+  document.getElementById('error-modal').style.display = 'none';
+}
+
+function fixAllErrors() {
+  const errorList = document.getElementById('error-list');
+  if (!errorList.children.length) return;
+  const visibleStory = document.querySelector('.story-container.visible');
+  if (!visibleStory) return;
+  for (let i = 0; i < errorList.children.length; i++) {
+    const text = errorList.children[i].textContent || "";
+    const labelPart = text.split(" is incorrect.")[0].toLowerCase();
+    fixError(visibleStory.id, labelPart);
+  }
+  hideErrorModal();
+}
+
+function fixError(storyId, part) {
+  const container = document.getElementById(storyId);
+  const dropzone = container.querySelector(`.dropzone[data-accept="${part}"]`);
+  const draggableContainer = document.getElementById(storyId + '-draggables');
+  if (dropzone && dropzone.children.length === 1) {
+    const wrongElement = dropzone.children[0];
+    dropzone.removeChild(wrongElement);
+    draggableContainer.appendChild(wrongElement);
+    wrongElement.classList.add('fly-back');
+    setTimeout(() => {
+      wrongElement.classList.remove('fly-back');
+    }, 500);
+  }
+  dropzone.classList.add('highlight');
+  setTimeout(() => {
+    dropzone.classList.remove('highlight');
+  }, 1000);
+  recheckErrors(storyId);
+}
+function recheckErrors(storyId) {
+  const container = document.getElementById(storyId);
+  const dropzones = container.querySelectorAll('.dropzone');
+  let errors = [];
+  dropzones.forEach(dz => {
+    const expected = dz.getAttribute('data-accept');
+    if (dz.children.length !== 1) {
+      errors.push(expected);
+    } else {
+      const child = dz.children[0];
+      if (child.getAttribute('data-part') !== expected) {
+        errors.push(expected);
+      }
+    }
+  });
+  if (errors.length === 0) {
+    hideErrorModal();
+  } else {
+    showErrorModal(storyId, errors);
+  }
+}
+
+let confettiCanvas = document.getElementById('confetti-canvas');
+let confettiCtx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiActive = false;
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+function initConfetti() {
+  let confettiCount = 120;
+  for (let i = 0; i < confettiCount; i++) {
+    confettiParticles.push({
+      x: randomRange(0, window.innerWidth),
+      y: randomRange(0, window.innerHeight),
+      r: randomRange(2, 6),
+      d: randomRange(1, 2),
+      color: `hsl(${randomRange(0,360)},100%,50%)`,
+      tilt: randomRange(-10, 10)
+    });
+  }
+  confettiCanvas.style.display = 'block';
+  confettiActive = true;
+  animateConfetti();
+}
+function animateConfetti() {
+  if (!confettiActive) return;
+  confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  confettiParticles.forEach((p) => {
+    confettiCtx.beginPath();
+    confettiCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
+    confettiCtx.fillStyle = p.color;
+    confettiCtx.fill();
+    p.x += Math.sin(0.01) * p.d;
+    p.y += (Math.cos(0.01) + p.r / 2) * p.d;
+    p.tilt += 0.1;
+    if (p.y > window.innerHeight) {
+      p.x = randomRange(0, window.innerWidth);
+      p.y = -10;
+    }
+  });
+  requestAnimationFrame(animateConfetti);
+}
+function stopConfetti() {
+  confettiActive = false;
+  confettiCanvas.style.display = 'none';
+  confettiParticles = [];
+}
+
+let draggedItem = null;
+document.addEventListener('dragstart', function (e) {
+  if (e.target.classList.contains('draggable')) {
+    draggedItem = e.target;
+    if (draggedItem.getAttribute('data-text')) {
+      draggedItem.textContent = draggedItem.getAttribute('data-text');
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  }
+});
+document.addEventListener('dragover', function (e) {
+  e.preventDefault();
+});
+document.addEventListener('drop', function (e) {
+  e.preventDefault();
+  if (e.target.classList.contains('dropzone') && draggedItem) {
+    e.target.innerHTML = '';
+    e.target.appendChild(draggedItem);
+    let zoneName = e.target.getAttribute('data-accept');
+    let partTitle = zoneName.charAt(0).toUpperCase() + zoneName.slice(1);
+    draggedItem.innerHTML = `<strong>${partTitle}:</strong> ${draggedItem.getAttribute('data-text')}`;
+    draggedItem = null;
+  }
+});
+
+function checkAnswers(storyId) {
+  const container = document.getElementById(storyId);
+  const dropzones = container.querySelectorAll('.dropzone');
+  let errors = [];
+  dropzones.forEach(dz => {
+    const expected = dz.getAttribute('data-accept');
+    if (dz.children.length !== 1) {
+      errors.push(expected);
+    } else {
+      const child = dz.children[0];
+      if (child.getAttribute('data-part') !== expected) {
+        errors.push(expected);
+      }
+    }
+  });
+  if (errors.length > 0) {
+    showErrorModal(storyId, errors);
+  } else {
+    hideErrorModal();
+    const congrats = document.getElementById(storyId + '-congrats');
+    if (congrats) congrats.style.display = 'block';
+    initConfetti();
+    setTimeout(stopConfetti, 3000);
+    const quiz = document.getElementById(storyId + '-quiz');
+    if (quiz) quiz.style.display = 'block';
+  }
+}
+function submitQuiz(storyId) {
+  const container = document.getElementById(storyId);
+  const quizContainer = container.querySelector('.quiz-container');
+  if (!quizContainer) return;
+  let score = 0;
+  const inputs = quizContainer.querySelectorAll('input[type="radio"]');
+  let answerGroups = {};
+  inputs.forEach((input) => {
+    const name = input.getAttribute('name');
+    if (!answerGroups[name]) {
+      answerGroups[name] = [];
+    }
+    answerGroups[name].push(input);
+  });
+  Object.keys(answerGroups).forEach((groupName) => {
+    const radios = answerGroups[groupName];
+    radios.forEach(radio => {
+      if (radio.checked && radio.value === 'correct') {
+        score++;
+      }
+    });
+  });
+  const scoreMessage = container.querySelector('.score-message');
+  if (scoreMessage) {
+    scoreMessage.textContent = `You scored ${score} out of 5!`;
+    scoreMessage.style.display = 'block';
+  }
+  const nextBtn = document.getElementById(storyId + '-next');
+  if (nextBtn) {
+    nextBtn.style.display = 'inline-block';
+  }
+}
+
+function showStory(storyId) {
+  const allStories = document.querySelectorAll('.story-container');
+  allStories.forEach(story => {
+    story.classList.remove('visible');
+  });
+  const target = document.getElementById(storyId);
+  if (target) {
+    target.classList.add('visible');
+    window.scrollTo(0, 0);
+  }
+}
+
+window.addEventListener('resize', function() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+});
+
+window.onload = function() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  document.getElementById('all-stories-container').innerHTML = window.ALL_STORIES_HTML;
+  showStory('intro-page');
+};
+</script>
+</body>
+</html>
