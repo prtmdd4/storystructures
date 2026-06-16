@@ -81,12 +81,14 @@ const App = (() => {
 
     let node;
     switch (state.screen) {
-      case 'home':     node = Render.home(); break;
-      case 'lesson':   node = Render.lesson(state.storyIdx, state.lessonStep); break;
-      case 'practice': node = Practice.build(state.storyIdx); break;
-      case 'quiz':     node = Quiz.buildQuestion(state.storyIdx, state.questionIdx, state.results); break;
-      case 'result':   node = Quiz.buildResult(state.storyIdx, state.results); break;
-      default:         node = Render.home();
+      case 'home':         node = Render.home(); break;
+      case 'lesson':       node = Render.lesson(state.storyIdx, state.lessonStep); break;
+      case 'storypreview': node = Render.storyPreview(state.storyIdx, state.previewStep); break;
+      case 'practice':     node = Practice.build(state.storyIdx); break;
+      case 'quiz':         node = Quiz.buildQuestion(state.storyIdx, state.questionIdx, state.results); break;
+      case 'result':       node = Quiz.buildResult(state.storyIdx, state.results); break;
+      case 'gallery':      node = AiStory.buildGalleryScreen(state); break;
+      default:             node = Render.home();
     }
 
     appEl.appendChild(node);

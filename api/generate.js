@@ -12,40 +12,23 @@
 
 import { readFileSync }  from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { randomUUID }    from 'node:crypto';
 import { createClient }  from '@supabase/supabase-js';
+import { ensureDeviceId, today } from '../lib/device.js';
+import { persistStory }          from '../lib/persist.js';
 
-/* Load shared validateStory into globalThis via the IIFE */
+/* Load shared validateStory/sanitizeStory into globalThis via the IIFE */
 eval(readFileSync(fileURLToPath(new URL('../js/validate-story.js', import.meta.url)), 'utf8'));
 
-const MODEL          = process.env.AI_MODEL          || 'meta-llama/llama-3.1-8b-instruct';
-const FREE_PER_DEV   = parseInt(process.env.FREE_PER_DEVICE  || '3',  10);
-const FREE_GLOBAL    = parseInt(process.env.FREE_GLOBAL_CAP  || '50', 10);
-const COOKIE_NAME    = 'ss_device';
-const COOKIE_MAX_AGE = 365 * 24 * 3600; // 1 year
+const MODEL        = process.env.AI_MODEL         || 'meta-llama/llama-3.1-8b-instruct';
+const FREE_PER_DEV = parseInt(process.env.FREE_PER_DEVICE || '3',  10);
+const FREE_GLOBAL  = parseInt(process.env.FREE_GLOBAL_CAP || '50', 10);
 
 /* Supabase client — optional; if env vars absent, rate limiting is skipped (local dev) */
 const supabase = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY)
   ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
   : null;
 
-/* ---- Cookie helpers ---------------------------------------- */
-function getDeviceId(req) {
-  const raw   = req.headers.cookie || '';
-  const match = raw.match(/(?:^|;\s*)ss_device=([a-f0-9-]{36})/);
-  return match ? match[1] : null;
-}
-
-function setDeviceCookie(res, id) {
-  res.setHeader('Set-Cookie',
-    `${COOKIE_NAME}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`);
-}
-
 /* ---- Rate limiting via Supabase ---------------------------- */
-function today() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
-}
-
 async function checkUsage(deviceId) {
   if (!supabase) return { allowed: true };
   const day = today();
@@ -178,12 +161,7 @@ export default async function handler(req, res) {
   }
 
   /* Device ID */
-  let deviceId = getDeviceId(req);
-  const isNew  = !deviceId;
-  if (!deviceId) {
-    deviceId = randomUUID();
-  }
-  if (isNew) setDeviceCookie(res, deviceId);
+  const deviceId = ensureDeviceId(req, res);
 
   /* Rate limit check */
   const quota = await checkUsage(deviceId);
@@ -210,7 +188,7 @@ export default async function handler(req, res) {
       const raw = await callOpenRouter(process.env.OPENROUTER_API_KEY, prompt);
       const validation = globalThis.validateStory(raw);
       if (validation.ok) {
-        story = raw;
+        story = globalThis.sanitizeStory(raw); // escape once, before storage/response
         break;
       }
       if (attempt === 2) {
@@ -234,6 +212,10 @@ export default async function handler(req, res) {
   story.id    = `ai-${Date.now()}`;
   story.level = parseInt(body?.level || '2', 10) || 2;
   story.ai    = true;
+
+  /* Persist so the creator can revisit it and others can browse it in the
+     gallery. Best-effort — a save failure must never block play. */
+  await persistStory(supabase, { deviceId, theme: globalThis.escapeHtml(theme), story });
 
   res.status(200).json(story);
 }

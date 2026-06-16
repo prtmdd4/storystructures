@@ -220,3 +220,42 @@ test('VALID_STORY_PARTS matches PARTS', () => {
     ['introduction', 'rising', 'climax', 'falling', 'resolution']
   );
 });
+
+/* ---- escapeHtml / sanitizeStory tests (stored-XSS fix) -- */
+test('escapeHtml neutralizes HTML special characters', () => {
+  const out = globalThis.escapeHtml('<script>alert(1)</script> & "quotes" \'apos\'');
+  assert.ok(!out.includes('<script>'));
+  assert.ok(out.includes('&lt;script&gt;'));
+  assert.ok(out.includes('&amp;'));
+  assert.ok(out.includes('&quot;'));
+  assert.ok(out.includes('&#39;'));
+});
+
+test('escapeHtml leaves ordinary punctuation readable after one pass', () => {
+  const out = globalThis.escapeHtml("it's a dragon & friends");
+  assert.equal(out, 'it&#39;s a dragon &amp; friends');
+});
+
+test('sanitizeStory escapes title, all parts, and all quiz text fields', () => {
+  const bad = JSON.parse(JSON.stringify(goodStory));
+  bad.title              = '<img src=x onerror=alert(1)>';
+  bad.parts.introduction += ' <b>bold</b>';
+  bad.quiz[0].q           = '<script>bad()</script>?';
+  bad.quiz[0].choices[0]  = '<svg onload=alert(1)>';
+  bad.quiz[0].why         = 'Because <i>so</i>.';
+
+  const clean = globalThis.sanitizeStory(bad);
+  assert.ok(!clean.title.includes('<img'));
+  assert.ok(!clean.parts.introduction.includes('<b>'));
+  assert.ok(!clean.quiz[0].q.includes('<script>'));
+  assert.ok(!clean.quiz[0].choices[0].includes('<svg'));
+  assert.ok(!clean.quiz[0].why.includes('<i>'));
+  /* structural fields (answer/part) must pass through untouched */
+  assert.equal(clean.quiz[0].answer, bad.quiz[0].answer);
+  assert.equal(clean.quiz[0].part, bad.quiz[0].part);
+});
+
+test('sanitizeStory output still passes validateStory', () => {
+  const clean = globalThis.sanitizeStory(goodStory);
+  assert.ok(globalThis.validateStory(clean).ok);
+});

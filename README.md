@@ -45,22 +45,31 @@ Create a `.env.local` (gitignored) or set these in the Vercel dashboard:
 | `SUPABASE_SERVICE_KEY` | No, same as above | The **service_role** secret key (Settings → API in Supabase dashboard) — NOT the anon/publishable key. Needed because the `ss_*` tables have RLS enabled with no public policies. |
 | `FREE_PER_DEVICE` | No (default: `3`) | Free AI stories per device per day. |
 | `FREE_GLOBAL_CAP` | No (default: `50`) | Hard daily cap across all users — our cost backstop. |
+| `SAVE_PER_DEVICE` | No (default: `20`) | Max BYOK stories one device can save to the gallery per day (spam guard — saving is free for us, but unbounded saves could flood the gallery). |
 
-Without `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` set, `api/generate.js` and
-`api/waitlist.js` still work but skip rate limiting / persistence (useful for
-local dev). Without `OPENROUTER_API_KEY`, the free tier returns a clear
-"not configured" error — kids can still use BYOK (see below).
+Without `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` set, the API routes still work
+but skip rate limiting / persistence (useful for local dev). Without
+`OPENROUTER_API_KEY`, the free tier returns a clear "not configured" error —
+kids can still use BYOK (see below).
 
 ### Supabase setup
 
-This project shares a Supabase instance with other apps. Three tables exist,
+This project shares a Supabase instance with other apps. Five tables exist,
 namespaced with `ss_` to stay clearly separated:
 
 - `ss_waitlist` (email, source, created_at) — signups from the waitlist modal.
 - `ss_free_usage` (device_id, day, count) — per-device daily AI generation count.
 - `ss_global_usage` (day, count) — global daily AI generation count (cost cap).
+- `ss_ai_stories` (story_key, device_id, theme, title, parts, quiz, level,
+  hidden, created_at) — every AI-generated story, so creators can revisit
+  theirs ("My Stories") and others can browse them ("Community Stories").
+  Text fields are HTML-escaped exactly once at save time (see "Security" below)
+  before being stored — never re-escape them.
+- `ss_save_usage` (device_id, day, count) — per-device daily save count, a
+  spam guard specifically for the BYOK path (free-tier saves are already
+  capped by `ss_free_usage`).
 
-All three have RLS **enabled with no policies**, so only the `service_role`
+All five have RLS **enabled with no policies**, so only the `service_role`
 key (used server-side in `api/*.js`) can read/write them — the anon key has
 zero access. Two `SECURITY DEFINER` RPCs (`ss_increment_device_usage`,
 `ss_increment_global_usage`) do atomic counter increments to avoid race
@@ -104,9 +113,46 @@ Cost discipline, by design:
   server and BYOK paths) before it ever reaches the game, so a malformed or
   unsafe AI response can't break the UI.
 
-AI-generated stories are session-only (pushed into the in-memory `STORIES`
-array, not persisted) — refreshing the page clears them. This is intentional
-for a prototype; the curated 10 stories always persist via `localStorage`.
+### Story persistence & the gallery
+
+Every AI-generated story (free tier or BYOK) is saved to `ss_ai_stories` so:
+- The creator can revisit it later via **🎨 Story Gallery → ⭐ My Stories**.
+- Other visitors can play it via **🎨 Story Gallery → 🌍 Community Stories**.
+
+After generating, a child sees a **story preview** screen first (not the
+generic curated-story lesson) — it announces each part by name and reads
+that part's actual sentence aloud (Web Speech API), then hands off to the
+same sort/quiz flow as every other story. See `Render.storyPreview` in
+`js/render.js`.
+
+There's no privacy toggle yet — anything generated is visible to everyone in
+the Community tab by default (the `hidden` column on `ss_ai_stories` exists
+for future moderation, but nothing sets it today).
+
+### Security: sanitizing AI text before storage
+
+AI story text is LLM output responding to free-text user input. Once stories
+are shared with strangers via the gallery, inserting that text unescaped into
+`innerHTML` (which `render.js`/`dragdrop.js`/`quiz.js` all do) is a stored-XSS
+vector — a malicious theme/title could run script in every viewer's browser.
+
+The fix: `sanitizeStory()` / `escapeHtml()` in `js/validate-story.js` HTML-escape
+all free-text fields (title, parts, quiz q/choices/why). This runs **exactly
+once**, server-side, at the single point each story is persisted:
+- `api/generate.js` (free tier) — sanitizes right after `validateStory()` passes.
+- `api/save-story.js` (BYOK) — the *only* place a BYOK story is sanitized; the
+  client never pre-sanitizes, and always plays back whatever this endpoint
+  returns rather than its own raw copy.
+
+**Do not call `sanitizeStory()` more than once on the same object** —
+escaping already-escaped text mangles ordinary punctuation (an apostrophe
+becomes `&amp;#39;` instead of `&#39;`, which then displays literally instead
+of decoding back to `'`).
+
+AI-generated stories also live in the in-memory `STORIES` array client-side
+while being played (same as the curated 10) — that part is unchanged and
+still resets on refresh; what's new is that the *content* is now durable in
+Supabase regardless of whether the in-memory copy survives.
 
 ---
 
@@ -157,17 +203,21 @@ data/lessons.js          the 5 part definitions (label, definition, tip, example
 data/stories.js          the 10 hand-written stories
 js/audio.js              plays cached ElevenLabs mp3s; Web Speech fallback for AI stories
 js/progress.js           localStorage: stars, completed puzzles, level unlocks
-js/validate-story.js     shared AI-story schema validator (browser + server)
-js/aistory.js            "Make Your Own Story" UI: free tier, BYOK, waitlist modals
-js/render.js             home + lesson screen DOM builders
+js/validate-story.js     shared AI-story schema validator + sanitizer (browser + server)
+js/aistory.js            "Make Your Own Story" UI: free tier, BYOK, waitlist, gallery
+js/render.js             home, lesson, and AI-story-preview screen DOM builders
 js/dragdrop.js           practice screen: Pointer Events drag/drop + keyboard
 js/quiz.js               quiz screen: scoring, mastery gate, remediation
-js/app.js                state machine, confetti, navigation
-api/generate.js          serverless: free-tier AI generation (rate-limited)
+js/app.js                state machine, confetti, navigation (incl. gallery/preview screens)
+lib/device.js            shared device-id cookie helper (outside api/ so Vercel won't route it)
+lib/persist.js           shared insert into ss_ai_stories
+api/generate.js          serverless: free-tier AI generation (rate-limited, sanitizes, persists)
+api/save-story.js        serverless: validates/sanitizes/persists a BYOK story, returns canonical copy
+api/stories.js           serverless: browse community/own AI stories for the gallery
 api/waitlist.js          serverless: email capture
 tools/generate-audio.mjs author-time ElevenLabs narration generator
 audio/                   generated mp3s + manifest.json (committed)
-tests/logic.test.mjs     node:test unit tests (scoring, mastery, unlock, validateStory)
+tests/logic.test.mjs     node:test unit tests (scoring, mastery, unlock, validateStory, sanitizeStory)
 ```
 
 ## Tests

@@ -55,6 +55,7 @@ const Render = (() => {
       <p>Type any idea — an animal, a place, a superpower — and we'll build a brand-new story just for you!</p>
       <div class="ai-card-actions">
         <button class="btn ai-generate-btn" id="ai-gen-btn">✨ Create a Story</button>
+        <button class="btn btn-secondary" id="ai-gallery-btn">🎨 Story Gallery</button>
         ${AiStory.hasByokKey()
           ? '<button class="btn btn-secondary btn-small" id="ai-remove-key-btn">🔑 Remove My Key</button>'
           : ''}
@@ -62,6 +63,7 @@ const Render = (() => {
     wrap.appendChild(aiCard);
 
     aiCard.querySelector('#ai-gen-btn').addEventListener('click', () => AiStory.showModal());
+    aiCard.querySelector('#ai-gallery-btn').addEventListener('click', () => App.go('gallery', { scope: 'community' }));
     const rkBtn = aiCard.querySelector('#ai-remove-key-btn');
     if (rkBtn) rkBtn.addEventListener('click', () => {
       AiStory.removeByokKey();
@@ -206,6 +208,73 @@ const Render = (() => {
     return wrap;
   }
 
+  /* ---- STORY PREVIEW screen (AI-generated stories only) ---
+     Skips the generic "what is an Introduction?" teaching (the child
+     already knows it) and instead announces each part name, then reads
+     THAT part's actual generated sentence aloud, before practice. */
+  function storyPreview(storyIdx, step) {
+    const story = STORIES[storyIdx];
+    const totalSteps = PARTS.length;
+
+    const wrap = el('div', 'lesson-screen story-preview-screen');
+
+    let pips = '<div class="lesson-progress" role="progressbar" aria-valuenow="' + step + '" aria-valuemax="' + totalSteps + '">';
+    PARTS.forEach((_, i) => {
+      pips += `<div class="lesson-pip ${i < step ? 'complete' : i === step ? 'active' : ''}"></div>`;
+    });
+    pips += '</div>';
+
+    const part = PARTS[step];
+    const meta = PART_META[part];
+    const doneParts = PARTS.slice(0, step);
+
+    wrap.innerHTML = `
+      ${pips}
+      <div class="mountain-wrap" aria-hidden="true">
+        ${mountainSVG(part, doneParts)}
+      </div>
+      <h2 style="text-align:center;margin-bottom:4px;">✨ Your New Story!</h2>
+      <p style="text-align:center;color:var(--clr-text-soft);margin-bottom:18px;">${story.title}</p>`;
+
+    const card = el('div', `part-card ${meta.cssClass}`);
+    card.innerHTML = `
+      <div class="part-card-header">
+        <span class="part-emoji" aria-hidden="true">${meta.emoji}</span>
+        <div>
+          <div class="part-name-big">${meta.label}</div>
+          <div class="part-simple-label">(also called the "${meta.simpleLabel}")</div>
+        </div>
+        <button class="btn-icon" aria-label="Listen again" id="preview-replay-btn">🔊</button>
+      </div>
+      <p class="part-def story-preview-text">${story.parts[part]}</p>`;
+    wrap.appendChild(card);
+
+    card.querySelector('#preview-replay-btn').addEventListener('click',
+      () => Audio.speak(`${meta.label}! ${story.parts[part]}`));
+
+    const btnRow = el('div', 'btn-row');
+    if (step > 0) {
+      btnRow.appendChild(button('← Back', 'btn btn-secondary',
+        () => App.go('storypreview', { storyIdx, previewStep: step - 1 })));
+    } else {
+      btnRow.appendChild(button('🏠 Home', 'btn btn-secondary', () => App.go('home')));
+    }
+
+    if (step < totalSteps - 1) {
+      btnRow.appendChild(button('Next Part →', 'btn',
+        () => App.go('storypreview', { storyIdx, previewStep: step + 1 })));
+    } else {
+      btnRow.appendChild(button("Let's Sort It! 🎯", 'btn',
+        () => { Audio.ui('now-practice'); App.go('practice', { storyIdx }); }));
+    }
+    wrap.appendChild(btnRow);
+
+    /* auto-narrate: part name first, then the actual sentence */
+    setTimeout(() => Audio.speak(`${meta.label}! ${story.parts[part]}`), 400);
+
+    return wrap;
+  }
+
   /* ---- CELEBRATION / RESULT screens are in quiz.js -------- */
 
   /* ---- Helpers -------------------------------------------- */
@@ -230,5 +299,5 @@ const Render = (() => {
     return '⭐⭐';
   }
 
-  return { home, lesson, mountainSVG, el, button, starDisplay };
+  return { home, lesson, storyPreview, mountainSVG, el, button, starDisplay };
 })();

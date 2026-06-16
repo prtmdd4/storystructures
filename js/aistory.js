@@ -96,26 +96,41 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
     return data;
   }
 
+  /* ---- Persist a BYOK story server-side ----------------------
+     The server is the sole sanitizer (escapes HTML exactly once) and the
+     source of truth for what gets stored/shared — we always play back
+     whatever it returns, not our local raw copy. Saving is best-effort:
+     even on quota/db failure the server still returns a playable story. */
+  async function saveByokStory(story, theme) {
+    const res = await fetch('/api/save-story', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ story, theme }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Could not save your story');
+    return data.story;
+  }
+
   /* ---- Main generate orchestrator ---------------------------- */
   async function generate(theme, statusEl, btnEl) {
     const byokKey = localStorage.getItem(BYOK_KEY_NAME);
-    let story;
 
     try {
       if (byokKey) {
-        story = await callOpenRouterBYOK(byokKey, theme);
-        story.id    = `ai-${Date.now()}`;
-        story.level = 2;
-        story.ai    = true;
-      } else {
-        story = await callFreeTier(theme);
+        const raw = await callOpenRouterBYOK(byokKey, theme);
+        raw.id    = `ai-${Date.now()}`;
+        raw.level = 2;
+        raw.ai    = true;
+
+        /* Fast local structural check before round-tripping to our server */
+        const v = validateStory(raw);
+        if (!v.ok) throw new Error('Story format error: ' + v.errors[0]);
+
+        return await saveByokStory(raw, theme); // server-sanitized, canonical
       }
 
-      /* Client-side validation (catches BYOK edge cases) */
-      const v = validateStory(story);
-      if (!v.ok) throw new Error('Story format error: ' + v.errors[0]);
-
-      return story;
+      return await callFreeTier(theme); // already sanitized + saved server-side
 
     } catch (err) {
       if (err.status === 429) {
@@ -142,7 +157,11 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
     const storyIdx = STORIES.length - 1;
 
     closeModal();
-    App.go('lesson', { storyIdx, lessonStep: 0 });
+    /* AI stories skip the generic "what is an Introduction?" lesson —
+       the child already knows the concept; they want to hear THEIR story.
+       storypreview announces each part name then reads that part's actual
+       sentence, before handing off to the same practice/quiz flow. */
+    App.go('storypreview', { storyIdx, previewStep: 0 });
 
     /* Show waitlist prompt once, on first AI story success */
     if (!localStorage.getItem(WAITLIST_SHOWN_KEY)) {
@@ -337,5 +356,67 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
   function hasByokKey()    { return !!localStorage.getItem(BYOK_KEY_NAME); }
   function removeByokKey() { localStorage.removeItem(BYOK_KEY_NAME); }
 
-  return { showModal, showWaitlistModal, showByokModal, hasByokKey, removeByokKey };
+  /* ---- Story Gallery ------------------------------------------
+     Browse stories other kids made ("community") or just your own ("mine").
+     Content here was sanitized once server-side at save time — safe to
+     drop directly into innerHTML. */
+  async function fetchStories(scope) {
+    const res  = await fetch(`/api/stories?scope=${scope}`);
+    const data = await res.json();
+    return data.stories || [];
+  }
+
+  function buildGalleryScreen(opts = {}) {
+    const scope = opts.scope === 'mine' ? 'mine' : 'community';
+    const wrap = document.createElement('div');
+    wrap.className = 'gallery-screen';
+    wrap.innerHTML = `
+      <div class="gallery-header">
+        <h2>🎨 Story Gallery</h2>
+        <div class="gallery-tabs" role="tablist">
+          <button class="gallery-tab ${scope === 'community' ? 'active' : ''}" data-scope="community">🌍 Community Stories</button>
+          <button class="gallery-tab ${scope === 'mine' ? 'active' : ''}" data-scope="mine">⭐ My Stories</button>
+        </div>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"><p class="gallery-loading">Loading stories…</p></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="gallery-home-btn">🏠 Home</button>
+      </div>`;
+
+    wrap.querySelectorAll('.gallery-tab').forEach(btn => {
+      btn.addEventListener('click', () => App.go('gallery', { scope: btn.dataset.scope }));
+    });
+    wrap.querySelector('#gallery-home-btn').addEventListener('click', () => App.go('home'));
+
+    const grid = wrap.querySelector('#gallery-grid');
+    fetchStories(scope).then(stories => {
+      if (!stories.length) {
+        grid.innerHTML = scope === 'mine'
+          ? '<p class="gallery-empty">You haven’t made any stories yet! Go to the home screen and create one. ✨</p>'
+          : '<p class="gallery-empty">No stories yet — be the first to create one! ✨</p>';
+        return;
+      }
+      grid.innerHTML = '';
+      stories.forEach(story => {
+        const card = document.createElement('div');
+        card.className = 'gallery-card';
+        card.innerHTML = `
+          <div class="gallery-card-title">${story.title}</div>
+          ${story.theme ? `<div class="gallery-card-theme">"${story.theme}"</div>` : ''}
+          ${story.byMe ? '<div class="gallery-card-badge">⭐ Made by you</div>' : ''}
+          <button class="btn btn-small gallery-play-btn">▶ Play</button>`;
+        card.querySelector('.gallery-play-btn').addEventListener('click', () => playStory(story));
+        grid.appendChild(card);
+      });
+    }).catch(() => {
+      grid.innerHTML = '<p class="gallery-empty">Could not load stories. Try again!</p>';
+    });
+
+    return wrap;
+  }
+
+  return {
+    showModal, showWaitlistModal, showByokModal, hasByokKey, removeByokKey,
+    buildGalleryScreen,
+  };
 })();

@@ -60,6 +60,39 @@
     return { ok: errors.length === 0, errors };
   }
 
+  /* ---- Sanitization ----------------------------------------
+     AI story text is LLM output responding to free-text user input, and it
+     gets inserted into the page via innerHTML (render.js/dragdrop.js/quiz.js).
+     Once stories are shared in a public gallery, unescaped text is a stored-XSS
+     vector. escapeHtml/sanitizeStory run ONCE, server-side, right after
+     validateStory() passes — never call this more than once on the same object
+     (double-escaping mangles ordinary punctuation like apostrophes/ampersands). */
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function sanitizeStory(obj) {
+    const out = { ...obj };
+    out.title = escapeHtml(obj.title);
+    out.parts = {};
+    VALID_PARTS.forEach(p => { out.parts[p] = escapeHtml(obj.parts[p]); });
+    out.quiz = obj.quiz.map(q => ({
+      ...q,
+      q:       escapeHtml(q.q),
+      choices: q.choices.map(escapeHtml),
+      why:     escapeHtml(q.why),
+      /* answer (int) and part (enum) are not free text — left as-is */
+    }));
+    return out;
+  }
+
   g.validateStory     = validateStory;
+  g.sanitizeStory      = sanitizeStory;
+  g.escapeHtml         = escapeHtml;
   g.VALID_STORY_PARTS = VALID_PARTS;
 })(typeof globalThis !== 'undefined' ? globalThis : window);
