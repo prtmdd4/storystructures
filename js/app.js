@@ -69,6 +69,7 @@ const App = (() => {
   let state = { screen: 'home', storyIdx: 0, lessonStep: 0, questionIdx: 0, results: [] };
 
   function go(screen, opts = {}) {
+    Audio.stop();
     state = { ...state, screen, ...opts };
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
