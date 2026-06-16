@@ -584,10 +584,180 @@ header h1 {
 }
 .text-center { text-align: center; }
 
+/* ---- AI Story Card (home screen) ------------------------- */
+.ai-story-card {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 50%, #fce4ec 100%);
+  border: 2.5px solid #ffd54f;
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 18px rgba(255,180,0,.18);
+  text-align: center;
+}
+
+.ai-story-card h3 {
+  font-size: var(--fs-xl);
+  color: #e65100;
+  margin: 8px 0 10px;
+}
+
+.ai-story-card p {
+  color: var(--clr-text-soft);
+  margin-bottom: 16px;
+  font-size: var(--fs-base);
+}
+
+.ai-card-sparkle {
+  font-size: 1.4em;
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+
+.ai-card-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ai-generate-btn {
+  background: linear-gradient(135deg, #ff9933, #ff6600);
+  border-color: #e65100;
+  font-size: var(--fs-lg);
+  padding: 14px 28px;
+}
+
+.ai-generate-btn:hover, .ai-generate-btn:focus-visible {
+  background: linear-gradient(135deg, #ffad5a, #ff8533);
+}
+
+/* ---- Waitlist footer strip (home screen) ----------------- */
+.waitlist-footer-strip {
+  margin-top: 32px;
+  padding: 18px 20px;
+  background: var(--clr-surface);
+  border: 1.5px solid #e0d8c8;
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--clr-text-soft);
+  font-size: var(--fs-sm);
+}
+
+.waitlist-footer-strip p { margin-bottom: 10px; }
+
+/* ---- Modal overlay --------------------------------------- */
+.ai-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.ai-modal {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 32px 28px 28px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0,0,0,.25);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.ai-modal h2 {
+  font-size: var(--fs-xl);
+  color: var(--clr-text);
+  margin-bottom: 10px;
+}
+
+.ai-modal p {
+  color: var(--clr-text-soft);
+  margin-bottom: 14px;
+  font-size: var(--fs-base);
+}
+
+.ai-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.ai-modal-close:hover { background: #f0f0f0; color: #333; }
+
+/* ---- Theme input row ------------------------------------- */
+.ai-theme-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ai-theme-input {
+  flex: 1;
+  padding: 12px 14px;
+  font-size: var(--fs-base);
+  border: 2px solid #ddd;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  min-width: 0;
+}
+
+.ai-theme-input:focus {
+  outline: none;
+  border-color: var(--clr-accent);
+  box-shadow: 0 0 0 3px rgba(255,153,51,.2);
+}
+
+.ai-go-btn {
+  white-space: nowrap;
+  font-size: var(--fs-base);
+}
+
+/* ---- Status line ----------------------------------------- */
+.ai-status {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-soft);
+  min-height: 1.4em;
+}
+
+.ai-status.success { color: var(--clr-correct); font-weight: 700; }
+
+/* ---- BYOK modal ------------------------------------------ */
+.byok-error { color: var(--clr-incorrect); font-weight: 600; }
+
+/* ---- Waitlist modal -------------------------------------- */
+.waitlist-modal .waitlist-emoji { font-size: 3em; text-align: center; margin-bottom: 6px; }
+.waitlist-features {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+.waitlist-features li {
+  padding: 6px 0;
+  font-size: var(--fs-base);
+  border-bottom: 1px solid #f0f0f0;
+}
+.waitlist-features li:last-child { border-bottom: none; }
+
 /* ---- Responsive ------------------------------------------ */
 @media (max-width: 480px) {
   :root { --fs-base: 16px; --fs-lg: 20px; --fs-xl: 24px; }
   header h1 { font-size: 18px; }
   .dropzone-grid { grid-template-columns: 1fr; }
   .story-grid { grid-template-columns: 1fr 1fr; }
+  .ai-theme-row { flex-direction: column; }
+  .ai-go-btn { width: 100%; }
+  .ai-modal { padding: 24px 16px 20px; }
 }

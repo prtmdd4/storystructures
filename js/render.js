@@ -47,6 +47,27 @@ const Render = (() => {
         <p>Stories have 5 parts. Pick a story and let's discover them together!</p>
       </div>`;
 
+    /* AI story card */
+    const aiCard = el('div', 'ai-story-card');
+    aiCard.innerHTML = `
+      <div class="ai-card-sparkle" aria-hidden="true">✨ ✨ ✨</div>
+      <h3>Make Your Own Story!</h3>
+      <p>Type any idea — an animal, a place, a superpower — and we'll build a brand-new story just for you!</p>
+      <div class="ai-card-actions">
+        <button class="btn ai-generate-btn" id="ai-gen-btn">✨ Create a Story</button>
+        ${AiStory.hasByokKey()
+          ? '<button class="btn btn-secondary btn-small" id="ai-remove-key-btn">🔑 Remove My Key</button>'
+          : ''}
+      </div>`;
+    wrap.appendChild(aiCard);
+
+    aiCard.querySelector('#ai-gen-btn').addEventListener('click', () => AiStory.showModal());
+    const rkBtn = aiCard.querySelector('#ai-remove-key-btn');
+    if (rkBtn) rkBtn.addEventListener('click', () => {
+      AiStory.removeByokKey();
+      App.go('home');
+    });
+
     const levels = [1, 2, 3];
     const levelLabels = {
       1: '⭐ Level 1 — Beginning, Middle & End',
@@ -87,6 +108,14 @@ const Render = (() => {
       });
       wrap.appendChild(grid);
     });
+
+    /* Waitlist footer */
+    const wlFooter = el('div', 'waitlist-footer-strip');
+    wlFooter.innerHTML = `
+      <p>Love it? The full version has 100+ read-aloud stories, reading levels &amp; more.</p>
+      <button class="btn btn-secondary btn-small" id="wl-footer-btn">📬 Join the Waitlist</button>`;
+    wrap.appendChild(wlFooter);
+    wrap.querySelector('#wl-footer-btn').addEventListener('click', () => AiStory.showWaitlistModal('home_footer'));
 
     return wrap;
   }

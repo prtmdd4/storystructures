@@ -1,0 +1,15 @@
+{
+  "name": "storystructures",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/logic.test.mjs",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0"
+  },
+  "devDependencies": {
+    "vercel": "^54.0.0"
+  }
+}

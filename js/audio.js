@@ -50,15 +50,39 @@ const Audio = (() => {
     player.pause();
     player.currentTime = 0;
     currentKey = null;
+    if (window.speechSynthesis) speechSynthesis.cancel();
   }
 
-  /* Convenience helpers */
-  const storyPart  = (storyId, part) => play(`story-${storyId}-${part}`);
-  const lessonPart = (part)          => play(`lesson-${part}`);
-  const lessonTip  = (part)          => play(`lesson-${part}-tip`);
-  const lessonEx   = (part)          => play(`lesson-${part}-example`);
-  const quizQ      = (storyId, idx)  => play(`quiz-${storyId}-q${idx}`);
-  const ui         = (phrase)        => play(`ui-${phrase}`);
+  /* Web Speech API fallback for AI-generated stories (no ElevenLabs cache) */
+  function speak(text) {
+    if (!text || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utt   = new SpeechSynthesisUtterance(text);
+    utt.rate    = 0.88;
+    utt.pitch   = 1.05;
+    utt.volume  = 1;
+    speechSynthesis.speak(utt);
+  }
 
-  return { init, play, stop, storyPart, lessonPart, lessonTip, lessonEx, quizQ, ui };
+  /* Convenience helpers — fall back to Web Speech for AI stories (no manifest entry) */
+  function storyPart(storyId, part) {
+    const key = `story-${storyId}-${part}`;
+    if (manifest[key]) { play(key); return; }
+    const story = typeof STORIES !== 'undefined' && STORIES.find(s => s.id === storyId);
+    if (story?.parts?.[part]) speak(story.parts[part]);
+  }
+
+  function quizQ(storyId, idx) {
+    const key = `quiz-${storyId}-q${idx}`;
+    if (manifest[key]) { play(key); return; }
+    const story = typeof STORIES !== 'undefined' && STORIES.find(s => s.id === storyId);
+    if (story?.quiz?.[idx]?.q) speak(story.quiz[idx].q);
+  }
+
+  const lessonPart = (part)   => play(`lesson-${part}`);
+  const lessonTip  = (part)   => play(`lesson-${part}-tip`);
+  const lessonEx   = (part)   => play(`lesson-${part}-example`);
+  const ui         = (phrase) => play(`ui-${phrase}`);
+
+  return { init, play, stop, speak, storyPart, lessonPart, lessonTip, lessonEx, quizQ, ui };
 })();

@@ -11,6 +11,7 @@ import { fileURLToPath }    from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 eval(readFileSync(resolve(ROOT, 'data/lessons.js'), 'utf8'));
 eval(readFileSync(resolve(ROOT, 'data/stories.js'), 'utf8'));
+eval(readFileSync(resolve(ROOT, 'js/validate-story.js'), 'utf8'));
 
 /* ---- Helpers mirrored from app code -------------------- */
 function activeQuestions(story) {
@@ -149,4 +150,73 @@ test('PART_META has all 5 parts with required fields', () => {
     assert.ok(m.example,      `${p} missing example`);
     assert.ok(m.narrationKey, `${p} missing narrationKey`);
   });
+});
+
+/* ---- validateStory tests -------------------------------- */
+const goodStory = {
+  title: 'The Magic Balloon',
+  parts: {
+    introduction: 'One sunny day, a girl named Lily found a glowing balloon tied to her fence.',
+    rising:       'She climbed inside and the balloon lifted her high above the clouds.',
+    climax:       'Suddenly, a strong wind carried the balloon toward a floating island in the sky!',
+    falling:      'Lily steered the balloon carefully toward home, guided by the stars below.',
+    resolution:   'She landed safely in her backyard, and the balloon turned into a golden star.',
+  },
+  quiz: [
+    { q: 'Where did Lily find the balloon?', choices: ['On her fence', 'In a tree', 'By the river'], answer: 0, part: 'introduction', why: 'The story begins at Lily\'s fence.' },
+    { q: 'What did Lily do with the balloon?', choices: ['Popped it', 'Climbed inside', 'Gave it away'], answer: 1, part: 'rising', why: 'Climbing inside starts the adventure.' },
+    { q: 'What happened at the big moment?', choices: ['She fell', 'She slept', 'Wind took her to a floating island'], answer: 2, part: 'climax', why: 'The floating island is the exciting twist.' },
+    { q: 'How did Lily find her way home?', choices: ['She used stars', 'She called for help', 'A bird guided her'], answer: 0, part: 'falling', why: 'Stars guided her home — things calming down.' },
+    { q: 'What did the balloon become?', choices: ['A cloud', 'A golden star', 'A kite'], answer: 1, part: 'resolution', why: 'The golden star is the magical happy ending.' },
+  ],
+};
+
+test('validateStory accepts a valid story', () => {
+  const result = globalThis.validateStory(goodStory);
+  assert.ok(result.ok, `Expected ok but got errors: ${result.errors.join(', ')}`);
+});
+
+test('validateStory rejects a story missing a part', () => {
+  const bad = JSON.parse(JSON.stringify(goodStory));
+  delete bad.parts.climax;
+  const result = globalThis.validateStory(bad);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some(e => e.includes('climax')));
+});
+
+test('validateStory rejects a story with wrong quiz count', () => {
+  const bad = JSON.parse(JSON.stringify(goodStory));
+  bad.quiz = bad.quiz.slice(0, 4);
+  const result = globalThis.validateStory(bad);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some(e => e.includes('quiz')));
+});
+
+test('validateStory rejects out-of-range answer index', () => {
+  const bad = JSON.parse(JSON.stringify(goodStory));
+  bad.quiz[0].answer = 10;
+  const result = globalThis.validateStory(bad);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some(e => e.includes('answer')));
+});
+
+test('validateStory rejects duplicate quiz parts', () => {
+  const bad = JSON.parse(JSON.stringify(goodStory));
+  bad.quiz[1].part = 'introduction'; // duplicate
+  const result = globalThis.validateStory(bad);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some(e => e.includes('used twice')));
+});
+
+test('validateStory rejects non-object input', () => {
+  assert.equal(globalThis.validateStory(null).ok, false);
+  assert.equal(globalThis.validateStory('string').ok, false);
+  assert.equal(globalThis.validateStory([]).ok, false);
+});
+
+test('VALID_STORY_PARTS matches PARTS', () => {
+  assert.deepEqual(
+    globalThis.VALID_STORY_PARTS,
+    ['introduction', 'rising', 'climax', 'falling', 'resolution']
+  );
 });
