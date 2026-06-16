@@ -54,7 +54,7 @@ function collectClips() {
   /* Lesson content — definition, tip, example for each part */
   globalThis.PARTS.forEach(part => {
     const m = globalThis.PART_META[part];
-    clips.push({ key: `lesson-${part}`,         text: m.definition });
+    clips.push({ key: `lesson-${part}`,         text: `${m.label}! Also called the ${m.simpleLabel}. ${m.definition}` });
     clips.push({ key: `lesson-${part}-tip`,     text: m.tip });
     clips.push({ key: `lesson-${part}-example`, text: m.example });
   });
