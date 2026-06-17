@@ -57,6 +57,12 @@ function collectClips() {
     clips.push({ key: `lesson-${part}`,         text: `${m.label}! Also called the ${m.simpleLabel}. ${m.definition}` });
     clips.push({ key: `lesson-${part}-tip`,     text: m.tip });
     clips.push({ key: `lesson-${part}-example`, text: m.example });
+    /* Bare part-name announcement (e.g. "Introduction!") — generated once
+       here, reused for every AI-generated story's narration so we never
+       have to bake the label into a per-story clip (which would leak the
+       answer when the same clip is reused for Practice's "read card aloud"
+       button on an unplaced card). */
+    clips.push({ key: `announce-${part}`, text: `${m.label}!` });
   });
 
   /* Story parts — each of the 5 sentences per story */

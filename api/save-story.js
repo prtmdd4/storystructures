@@ -19,6 +19,7 @@ import { readFileSync }  from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createClient }  from '@supabase/supabase-js';
 import { ensureDeviceId, today } from '../lib/device.js';
+import { generateStoryAudio }    from '../lib/audio.js';
 
 eval(readFileSync(fileURLToPath(new URL('../js/validate-story.js', import.meta.url)), 'utf8'));
 
@@ -63,6 +64,12 @@ export default async function handler(req, res) {
   story.level = rawStory.level || 2;
   story.ai    = true;
 
+  /* Generate real narration in the same ElevenLabs voice as curated content.
+     Runs regardless of the save-quota outcome below — the creator should
+     hear the real voice for their own playback even if the gallery save
+     itself gets skipped. Best-effort: {} on any failure/missing config. */
+  story.audio = await generateStoryAudio(supabase, story);
+
   const deviceId  = ensureDeviceId(req, res);
   const safeTheme = globalThis.escapeHtml(theme);
 
@@ -92,6 +99,7 @@ export default async function handler(req, res) {
     parts:     story.parts,
     quiz:      story.quiz,
     level:     story.level,
+    audio:     story.audio || {},
   });
 
   if (error && error.code !== '23505') {

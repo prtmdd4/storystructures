@@ -13,8 +13,9 @@
 import { readFileSync }  from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createClient }  from '@supabase/supabase-js';
-import { ensureDeviceId, today } from '../lib/device.js';
-import { persistStory }          from '../lib/persist.js';
+import { ensureDeviceId, today }   from '../lib/device.js';
+import { persistStory }            from '../lib/persist.js';
+import { generateStoryAudio }      from '../lib/audio.js';
 
 /* Load shared validateStory/sanitizeStory into globalThis via the IIFE */
 eval(readFileSync(fileURLToPath(new URL('../js/validate-story.js', import.meta.url)), 'utf8'));
@@ -212,6 +213,12 @@ export default async function handler(req, res) {
   story.id    = `ai-${Date.now()}`;
   story.level = parseInt(body?.level || '2', 10) || 2;
   story.ai    = true;
+
+  /* Generate real narration in the same ElevenLabs voice as curated content
+     (not the browser's Web Speech fallback). Best-effort — if ElevenLabs
+     is unconfigured or quota runs out, story.audio is {} and the frontend
+     falls back to Web Speech per-clip, it never blocks generation. */
+  story.audio = await generateStoryAudio(supabase, story);
 
   /* Persist so the creator can revisit it and others can browse it in the
      gallery. Best-effort — a save failure must never block play. */

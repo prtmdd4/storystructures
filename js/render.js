@@ -126,6 +126,13 @@ const Render = (() => {
   function lesson(storyIdx, step) {
     const story = STORIES[storyIdx];
     const totalSteps = PARTS.length; // 0-4 = one per part
+    const isAi = !!story.ai;
+    /* Level 1 (the first stories a child meets) uses the story's OWN
+       sentence as the worked example too — "near transfer": recognize the
+       concept in the exact story they're about to sort, before Level 2/3
+       ask them to transfer the concept to the universal "Friendly Giant"
+       example shown alongside a DIFFERENT story than the one being studied. */
+    const useOwnExample = isAi || story.level === 1;
 
     const wrap = el('div', 'lesson-screen');
 
@@ -148,11 +155,13 @@ const Render = (() => {
         ${mountainSVG(part, doneParts)}
       </div>
       <h2 style="text-align:center;margin-bottom:4px;">
-        📖 Lesson ${storyIdx + 1} of ${STORIES.length}
+        ${isAi ? '✨ Your Story!' : `📖 Lesson ${storyIdx + 1} of ${STORIES.length}`}
       </h2>
       <p style="text-align:center;color:var(--clr-text-soft);margin-bottom:18px;">${story.title}</p>`;
 
-    /* part card */
+    /* part card — Level 1 and AI stories show THIS story's own sentence as
+       the example (recognition); Level 2/3 show the universal "Friendly
+       Giant" example (transfer). */
     const card = el('div', `part-card ${meta.cssClass}`);
     card.innerHTML = `
       <div class="part-card-header">
@@ -170,13 +179,20 @@ const Render = (() => {
           onclick="Audio.lessonTip('${part}')">🔊</button>
       </p>
       <div class="example-box">
-        <p><strong>Example from "The Friendly Giant":</strong>
-          <button class="btn-icon" style="font-size:.85em;" aria-label="Listen to example"
-            onclick="Audio.lessonEx('${part}')">🔊</button>
+        <p><strong>${useOwnExample ? `Example from "${story.title}":` : 'Example from "The Friendly Giant":'}</strong>
+          <button class="btn-icon" style="font-size:.85em;" aria-label="Listen to example" id="lesson-example-btn">🔊</button>
         </p>
-        <p>"${meta.example}"</p>
+        <p>"${useOwnExample ? story.parts[part] : meta.example}"</p>
       </div>`;
     wrap.appendChild(card);
+
+    /* Bound via addEventListener (not inline onclick) since story.parts[part]
+       may contain quote characters that would break an inline JS string. */
+    card.querySelector('#lesson-example-btn').addEventListener('click', () => {
+      if (isAi) Audio.announcePart(part, () => Audio.storyPart(story.id, part));
+      else if (useOwnExample) Audio.storyPart(story.id, part); // curated Level 1: cached ElevenLabs clip, free
+      else Audio.lessonEx(part);
+    });
 
     /* nav buttons */
     const btnRow = el('div', 'btn-row');
@@ -202,75 +218,14 @@ const Render = (() => {
 
     wrap.appendChild(btnRow);
 
-    /* auto-play the definition for this part */
-    setTimeout(() => Audio.lessonPart(part), 400);
-
-    return wrap;
-  }
-
-  /* ---- STORY PREVIEW screen (AI-generated stories only) ---
-     Skips the generic "what is an Introduction?" teaching (the child
-     already knows it) and instead announces each part name, then reads
-     THAT part's actual generated sentence aloud, before practice. */
-  function storyPreview(storyIdx, step) {
-    const story = STORIES[storyIdx];
-    const totalSteps = PARTS.length;
-
-    const wrap = el('div', 'lesson-screen story-preview-screen');
-
-    let pips = '<div class="lesson-progress" role="progressbar" aria-valuenow="' + step + '" aria-valuemax="' + totalSteps + '">';
-    PARTS.forEach((_, i) => {
-      pips += `<div class="lesson-pip ${i < step ? 'complete' : i === step ? 'active' : ''}"></div>`;
-    });
-    pips += '</div>';
-
-    const part = PARTS[step];
-    const meta = PART_META[part];
-    const doneParts = PARTS.slice(0, step);
-
-    wrap.innerHTML = `
-      ${pips}
-      <div class="mountain-wrap" aria-hidden="true">
-        ${mountainSVG(part, doneParts)}
-      </div>
-      <h2 style="text-align:center;margin-bottom:4px;">✨ Your New Story!</h2>
-      <p style="text-align:center;color:var(--clr-text-soft);margin-bottom:18px;">${story.title}</p>`;
-
-    const card = el('div', `part-card ${meta.cssClass}`);
-    card.innerHTML = `
-      <div class="part-card-header">
-        <span class="part-emoji" aria-hidden="true">${meta.emoji}</span>
-        <div>
-          <div class="part-name-big">${meta.label}</div>
-          <div class="part-simple-label">(also called the "${meta.simpleLabel}")</div>
-        </div>
-        <button class="btn-icon" aria-label="Listen again" id="preview-replay-btn">🔊</button>
-      </div>
-      <p class="part-def story-preview-text">${story.parts[part]}</p>`;
-    wrap.appendChild(card);
-
-    card.querySelector('#preview-replay-btn').addEventListener('click',
-      () => Audio.speak(`${meta.label}! ${story.parts[part]}`));
-
-    const btnRow = el('div', 'btn-row');
-    if (step > 0) {
-      btnRow.appendChild(button('← Back', 'btn btn-secondary',
-        () => App.go('storypreview', { storyIdx, previewStep: step - 1 })));
-    } else {
-      btnRow.appendChild(button('🏠 Home', 'btn btn-secondary', () => App.go('home')));
-    }
-
-    if (step < totalSteps - 1) {
-      btnRow.appendChild(button('Next Part →', 'btn',
-        () => App.go('storypreview', { storyIdx, previewStep: step + 1 })));
-    } else {
-      btnRow.appendChild(button("Let's Sort It! 🎯", 'btn',
-        () => { Audio.ui('now-practice'); App.go('practice', { storyIdx }); }));
-    }
-    wrap.appendChild(btnRow);
-
-    /* auto-narrate: part name first, then the actual sentence */
-    setTimeout(() => Audio.speak(`${meta.label}! ${story.parts[part]}`), 400);
+    /* auto-narrate: AI stories announce the part name then read their own
+       sentence (real ElevenLabs voice, with Web Speech as a last resort —
+       see Audio.storyPart); curated stories play the cached concept
+       definition, same as always. */
+    setTimeout(() => {
+      if (isAi) Audio.announcePart(part, () => Audio.storyPart(story.id, part));
+      else Audio.lessonPart(part);
+    }, 400);
 
     return wrap;
   }
@@ -299,5 +254,5 @@ const Render = (() => {
     return '⭐⭐';
   }
 
-  return { home, lesson, storyPreview, mountainSVG, el, button, starDisplay };
+  return { home, lesson, mountainSVG, el, button, starDisplay };
 })();

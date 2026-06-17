@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
   let query = supabase
     .from('ss_ai_stories')
-    .select('story_key, device_id, theme, title, parts, quiz, level, created_at')
+    .select('story_key, device_id, theme, title, parts, quiz, level, audio, created_at')
     .eq('hidden', false)
     .order('created_at', { ascending: false })
     .limit(LIMIT);
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
     parts:     row.parts,
     quiz:      row.quiz,
     level:     row.level,
+    audio:     row.audio || {},
     createdAt: row.created_at,
     byMe:      deviceId ? row.device_id === deviceId : false,
     ai:        true,
