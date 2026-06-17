@@ -78,6 +78,24 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
     return JSON.parse(clean);
   }
 
+  /* Parse a fetch Response as JSON, but degrade gracefully when the body
+     isn't JSON (e.g. a Vercel 504/500 HTML error page when a function
+     times out) — otherwise the raw "JSON.parse: unexpected character"
+     leaks to the child instead of a friendly message. */
+  async function parseJson(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      const msg = res.status >= 500
+        ? 'The story machine took too long. Please try again!'
+        : 'Something went wrong talking to the story machine. Please try again!';
+      const err = new Error(msg);
+      err.status = res.status;
+      throw err;
+    }
+  }
+
   /* ---- Call our /api/generate endpoint (free tier) ----------- */
   async function callFreeTier(theme) {
     const res = await fetch('/api/generate', {
@@ -86,7 +104,7 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
       body:    JSON.stringify({ theme, level: 2 }),
     });
 
-    const data = await res.json();
+    const data = await parseJson(res);
     if (!res.ok) {
       const err = new Error(data.error || 'Generation failed');
       err.code  = data.code || 'unknown';
@@ -107,7 +125,7 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ story, theme }),
     });
-    const data = await res.json();
+    const data = await parseJson(res);
     if (!res.ok) throw new Error(data.error || 'Could not save your story');
     return data.story;
   }
