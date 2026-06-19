@@ -357,4 +357,44 @@ globalThis.STORIES = [
         why: 'Sharing the magic is the Resolution — the story ends with kindness, gratitude, and joy!' },
     ],
   },
+
+  /* The Friendly Giant — its own pickable story. (Previously this was only the
+     universal "worked example" shown during Level 2/3 lessons; now every
+     lesson's example comes from the story being studied, and the giant stands
+     on its own. Its part sentences match PART_META[*].example so the existing
+     author-time narration could be reused if desired.) */
+  {
+    id: 'friendly-giant',
+    title: 'The Friendly Giant',
+    level: 2,
+    parts: {
+      introduction: 'There was a giant who lived on a tall hill, feeling very lonely.',
+      rising:       'He heard there was a village nearby, so he decided to visit — but all the villagers ran away from him!',
+      climax:       'One brave child walked forward and said "Hello!" — and everyone realized the giant was kind and just needed a friend.',
+      falling:      'All the villagers gathered around and listened to the giant tell his story.',
+      resolution:   'The giant became best friends with everyone in the village, and they visited him on his tall hill all the time.',
+    },
+    quiz: [
+      { q: 'How did the giant feel at the beginning?',
+        choices: ['Very lonely', 'Very angry', 'Very sleepy'],
+        answer: 0, part: 'introduction',
+        why: 'We meet the giant and learn he is lonely — that is the Introduction, where we meet the character!' },
+      { q: 'What happened when the giant visited the village?',
+        choices: ['The villagers threw a party', 'All the villagers ran away from him', 'He got lost on the way'],
+        answer: 1, part: 'rising',
+        why: 'The giant trying to make friends but being feared is the Rising Action — the problem is building up!' },
+      { q: 'What was the big turning point of the story?',
+        choices: ['The giant went back home', 'A brave child said "Hello!" and everyone saw he was kind', 'The village built a wall'],
+        answer: 1, part: 'climax',
+        why: 'One brave child changing everything is the Climax — the most important turning point!' },
+      { q: 'What did the villagers do after they were no longer afraid?',
+        choices: ['They gathered around and listened to his story', 'They ran away again', 'They moved to a new village'],
+        answer: 0, part: 'falling',
+        why: 'Gathering to listen is the Falling Action — things are calming down after the big moment.' },
+      { q: 'How did the story end?',
+        choices: ['The giant stayed lonely forever', 'The giant became best friends with the whole village', 'The giant left the hill'],
+        answer: 1, part: 'resolution',
+        why: 'The giant making friends with everyone is the Resolution — a happy ending where we see how it all turned out!' },
+    ],
+  },
 ];

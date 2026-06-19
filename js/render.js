@@ -119,6 +119,9 @@ const Render = (() => {
     wrap.appendChild(wlFooter);
     wrap.querySelector('#wl-footer-btn').addEventListener('click', () => AiStory.showWaitlistModal('home_footer'));
 
+    /* greet the child on landing (respects the mute toggle) */
+    setTimeout(() => Audio.ui('welcome'), 400);
+
     return wrap;
   }
 
@@ -127,12 +130,6 @@ const Render = (() => {
     const story = STORIES[storyIdx];
     const totalSteps = PARTS.length; // 0-4 = one per part
     const isAi = !!story.ai;
-    /* Level 1 (the first stories a child meets) uses the story's OWN
-       sentence as the worked example too — "near transfer": recognize the
-       concept in the exact story they're about to sort, before Level 2/3
-       ask them to transfer the concept to the universal "Friendly Giant"
-       example shown alongside a DIFFERENT story than the one being studied. */
-    const useOwnExample = isAi || story.level === 1;
 
     const wrap = el('div', 'lesson-screen');
 
@@ -159,9 +156,12 @@ const Render = (() => {
       </h2>
       <p style="text-align:center;color:var(--clr-text-soft);margin-bottom:18px;">${story.title}</p>`;
 
-    /* part card — Level 1 and AI stories show THIS story's own sentence as
-       the example (recognition); Level 2/3 show the universal "Friendly
-       Giant" example (transfer). */
+    /* part card — the worked example is ALWAYS the story the child is studying
+       (consistent, never the repeated "Friendly Giant"). The big ▶/⏸ button
+       reads the main narration: curated = the concept definition, AI/own = the
+       part name announced then the story's real sentence. For AI/own stories
+       the generic definition/tip stay on screen but are not read aloud (only
+       the actual story is narrated), so their speaker buttons are omitted. */
     const card = el('div', `part-card ${meta.cssClass}`);
     card.innerHTML = `
       <div class="part-card-header">
@@ -170,29 +170,38 @@ const Render = (() => {
           <div class="part-name-big">${meta.label}</div>
           <div class="part-simple-label">(also called the "${meta.simpleLabel}")</div>
         </div>
-        <button class="btn-icon" aria-label="Listen to definition"
-          onclick="Audio.lessonPart('${part}')">🔊</button>
+        <button class="btn-icon" style="font-size:1.5em;" id="lesson-play-btn" aria-label="Play"></button>
       </div>
-      <p class="part-def">${meta.definition}</p>
+      <p class="part-def">${meta.definition}
+        ${isAi ? '' : '<button class="btn-icon" style="font-size:.85em;" id="lesson-def-btn" aria-label="Play"></button>'}
+      </p>
       <p class="part-tip">💡 <em>${meta.tip}</em>
-        <button class="btn-icon" style="font-size:.9em;" aria-label="Listen to tip"
-          onclick="Audio.lessonTip('${part}')">🔊</button>
+        ${isAi ? '' : '<button class="btn-icon" style="font-size:.9em;" id="lesson-tip-btn" aria-label="Play"></button>'}
       </p>
       <div class="example-box">
-        <p><strong>${useOwnExample ? `Example from "${story.title}":` : 'Example from "The Friendly Giant":'}</strong>
-          <button class="btn-icon" style="font-size:.85em;" aria-label="Listen to example" id="lesson-example-btn">🔊</button>
+        <p><strong>Example from "${story.title}":</strong>
+          <button class="btn-icon" style="font-size:.85em;" id="lesson-example-btn" aria-label="Play"></button>
         </p>
-        <p>"${useOwnExample ? story.parts[part] : meta.example}"</p>
+        <p>"${story.parts[part]}"</p>
       </div>`;
     wrap.appendChild(card);
 
-    /* Bound via addEventListener (not inline onclick) since story.parts[part]
-       may contain quote characters that would break an inline JS string. */
-    card.querySelector('#lesson-example-btn').addEventListener('click', () => {
-      if (isAi) Audio.announcePart(part, () => Audio.storyPart(story.id, part));
-      else if (useOwnExample) Audio.storyPart(story.id, part); // curated Level 1: cached ElevenLabs clip, free
-      else Audio.lessonEx(part);
-    });
+    /* Wire the play/pause buttons. The example + primary button read the
+       story's own sentence (announcing the part name first for AI stories). */
+    const playMain = () =>
+      isAi ? Audio.announcePart(part, () => Audio.storyPart(story.id, part))
+           : Audio.lessonPart(part);
+    const mainKey = isAi ? `story-${story.id}-${part}` : `lesson-${part}`;
+
+    Audio.bindToggle(card.querySelector('#lesson-play-btn'), mainKey, playMain);
+    Audio.bindToggle(card.querySelector('#lesson-example-btn'), `story-${story.id}-${part}`,
+      () => isAi ? Audio.announcePart(part, () => Audio.storyPart(story.id, part))
+                 : Audio.storyPart(story.id, part));
+
+    const defBtn = card.querySelector('#lesson-def-btn');
+    if (defBtn) Audio.bindToggle(defBtn, `lesson-${part}`, () => Audio.lessonPart(part));
+    const tipBtn = card.querySelector('#lesson-tip-btn');
+    if (tipBtn) Audio.bindToggle(tipBtn, `lesson-${part}-tip`, () => Audio.lessonTip(part));
 
     /* nav buttons */
     const btnRow = el('div', 'btn-row');

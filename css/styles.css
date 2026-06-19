@@ -67,6 +67,12 @@ header h1 {
   font-weight: 800;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 #stars-display {
   font-size: var(--fs-lg);
   font-weight: 700;

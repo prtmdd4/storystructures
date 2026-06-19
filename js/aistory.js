@@ -175,11 +175,11 @@ Rules: vary answer positions, one quiz question per story part, simple grade 1-3
     const storyIdx = STORIES.length - 1;
 
     closeModal();
-    /* AI stories skip the generic "what is an Introduction?" lesson —
-       the child already knows the concept; they want to hear THEIR story.
-       storypreview announces each part name then reads that part's actual
-       sentence, before handing off to the same practice/quiz flow. */
-    App.go('storypreview', { storyIdx, previewStep: 0 });
+    /* Drop the child straight into the lesson flow for THEIR story. The lesson
+       screen announces each part name then reads that part's actual sentence
+       (see render.js / Audio.announcePart→storyPart), before handing off to the
+       same practice/quiz flow as curated stories. */
+    App.go('lesson', { storyIdx, lessonStep: 0 });
 
     /* Show waitlist prompt once, on first AI story success */
     if (!localStorage.getItem(WAITLIST_SHOWN_KEY)) {

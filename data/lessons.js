@@ -94,6 +94,7 @@ globalThis.PART_META = {
 globalThis.UI_NARRATION = {
   'ui-welcome':       "Welcome to Story Structure! Let's learn how stories are built!",
   'ui-now-practice':  "Great! Now let's try sorting the story parts yourself!",
+  'ui-sort-intro':    "Here's your story, all mixed up! Put the parts in the right order, from the beginning to the end. You can read them yourself — or tap the play button if you'd like me to read a part to you.",
   'ui-all-correct':   "Amazing! You put all the parts in the right place!",
   'ui-quiz-intro':    "Now let's check what you remember. Answer each question as best you can!",
   'ui-great-job':     "Great job! You got it right!",

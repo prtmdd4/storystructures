@@ -93,10 +93,20 @@ const App = (() => {
     appEl.appendChild(node);
   }
 
+  function syncMuteBtn() {
+    const btn = document.getElementById('header-mute-btn');
+    const off = Audio.isMuted();
+    btn.textContent = off ? '🔇' : '🔊';
+    btn.setAttribute('aria-label', off ? 'Turn audio on' : 'Turn audio off');
+  }
+
   async function init() {
     Progress.load();
     await Audio.init();
     document.getElementById('header-home-btn').addEventListener('click', () => go('home'));
+    const muteBtn = document.getElementById('header-mute-btn');
+    muteBtn.addEventListener('click', () => { Audio.setMuted(!Audio.isMuted()); syncMuteBtn(); });
+    syncMuteBtn();
     render();
   }
 

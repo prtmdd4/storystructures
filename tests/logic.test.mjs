@@ -41,8 +41,8 @@ function isUnlocked(story, completedIds) {
 }
 
 /* ---- Data integrity tests ------------------------------ */
-test('STORIES has 10 entries', () => {
-  assert.equal(globalThis.STORIES.length, 10);
+test('STORIES has 11 entries', () => {
+  assert.equal(globalThis.STORIES.length, 11);
 });
 
 test('each story has all 5 parts', () => {

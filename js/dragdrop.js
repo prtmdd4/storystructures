@@ -52,10 +52,18 @@ const Practice = (() => {
     wrap.innerHTML = `
       <div class="practice-header">
         <h2>${story.title}</h2>
-        <p>Drag each sentence into the correct slot on the story mountain!</p>
+        <p>Here's your story, all mixed up! Put the parts in order, from the
+           beginning to the end. Read them yourself — or tap
+           <button class="btn-icon" style="font-size:1em;" id="practice-play-btn" aria-label="Play"></button>
+           to have a part read to you.</p>
       </div>
       ${cfg.showSimple ? '<p class="kb-hint">💡 Tip: look for Beginning → Big Moment → The End</p>' : ''}
       <p class="kb-hint">⌨️ Keyboard: press <strong>Space</strong> on a card to select it, then <strong>Space</strong> on a slot to place it.</p>`;
+
+    /* Play/pause for the spoken sorting instructions (auto-plays on landing,
+       both gated by the global mute toggle). */
+    Audio.bindToggle(wrap.querySelector('#practice-play-btn'), 'ui-sort-intro', () => Audio.ui('sort-intro'));
+    setTimeout(() => Audio.ui('sort-intro'), 400);
 
     /* Card tray */
     const tray = Render.el('div', 'card-tray');
@@ -322,6 +330,7 @@ const Practice = (() => {
         footer.appendChild(backBtn);
       }
 
+      Audio.chime('success');
       Confetti.launch();
       setTimeout(Confetti.stop, 3500);
     }

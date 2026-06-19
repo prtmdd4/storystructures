@@ -44,13 +44,13 @@ const Quiz = (() => {
     wrap.insertAdjacentHTML('beforeend', pips);
 
     /* Question card */
+    const qIdx = story.quiz.indexOf(qObj);
     const card = Render.el('div', 'quiz-question-card');
     card.innerHTML = `
       <div class="quiz-q-text">
         <span class="quiz-q-num" aria-hidden="true">${questionIdx + 1}</span>
         <span>${qObj.q}</span>
-        <button class="btn-icon" style="font-size:.9em;" aria-label="Read question aloud"
-          onclick="Audio.quizQ('${story.id}',${story.quiz.indexOf(qObj)})">🔊</button>
+        <button class="btn-icon" style="font-size:1.1em;" id="quiz-play-btn" aria-label="Play"></button>
       </div>`;
 
     const list = Render.el('ul', 'choice-list');
@@ -79,6 +79,9 @@ const Quiz = (() => {
     card.appendChild(feedbackEl);
 
     wrap.appendChild(card);
+
+    Audio.bindToggle(card.querySelector('#quiz-play-btn'),
+      `quiz-${story.id}-q${qIdx}`, () => Audio.quizQ(story.id, qIdx));
 
     /* Next button (hidden until answered) */
     const nextBtn = Render.el('button', 'btn');
@@ -148,6 +151,7 @@ const Quiz = (() => {
         : `You need ${pass} correct to pass. Keep trying — you can do it!`}</div>`;
 
     if (passed) {
+      Audio.chime('success');
       Audio.ui('passed');
       Confetti.launch();
       setTimeout(Confetti.stop, 4000);
